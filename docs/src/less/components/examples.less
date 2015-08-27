@@ -1,0 +1,32 @@
+// ==========================================================================
+// Examples
+// ==========================================================================
+.examples {
+	display: inline-block;
+	vertical-align: middle;
+	padding: @padding-base (@padding-base * 2);
+	margin-bottom: @padding-base;
+	background: rgba(255,255,255, .1);
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0,0,0, .1);
+	text-shadow: none;
+
+	.button,
+	.button-addon {
+		display: inline-block;
+		vertical-align: middle;
+		margin-top: (@padding-base / 4);
+		margin-bottom: (@padding-base / 4);
+	}
+	.button-addon .button {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+	.share-count {
+		border-color: #fff;
+	}
+
+	@media (min-width: @screen-sm) {
+        margin-bottom: (@padding-base * 3);
+    }
+}

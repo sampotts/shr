@@ -1,0 +1,38 @@
+// ==========================================================================
+// Typography
+// ==========================================================================
+
+// Headings
+h1 {
+    letter-spacing: -.025em;
+    margin: 0 0 (@padding-base / 2);
+    line-height: 1.2;
+    .font-smoothing();
+    .font-size(64);
+}
+
+// Paragraph and small
+p,
+small {
+    margin: 0 0 @padding-base;
+}
+small {
+    display: block;
+    padding: 0 (@padding-base / 2);
+    .font-size(14);
+}
+
+// Links
+a {
+    text-decoration: none;
+    color: @link-color;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus {
+        text-decoration: none;
+    }
+    &:focus {
+        .tab-focus();
+    }
+}

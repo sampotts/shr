@@ -1,0 +1,115 @@
+// ==========================================================================
+// Shr.js styles
+// https://github.com/selz/shr
+// ==========================================================================
+
+// Base
+@shr-padding-base:              20px;
+
+// Button
+@shr-button-border-radius:      4px;
+@shr-button-bg-color:           #3498DB;
+@shr-button-text-color:         #FFF;
+@shr-button-border-width:       1px;
+
+@shr-button-base-bg-color:      #3498DB;
+@shr-button-facebook-bg-color:  #3C569A;
+@shr-button-twitter-bg-color:   #0F94FF;
+@shr-button-google-bg-color:    #DE4C35;
+@shr-button-pinterest-bg-color: #CB2026;
+
+// Count
+@shr-button-count-bg:           #FFF;
+@shr-button-count-border-color: #DBE3E8;
+@shr-button-count-text-color:   #55646B;
+@shr-button-count-arrow-size:   8px;
+
+// Mixins
+.button-styles(@background-color: @shr-button-base-bg-color) {
+    background-image: linear-gradient(@background-color, darken(@background-color, 4%));
+    background-color: @background-color;
+    border: @shr-button-border-width solid darken(@background-color, 10%);
+
+    &:hover,
+    &:focus {
+        border-color: darken(@background-color, 15%);
+    }
+}
+
+// Button addon
+.button-addon + .button-addon,
+.button-addon + .button {
+    margin-left: (@shr-padding-base / 2);
+}
+.button-addon {
+    white-space: nowrap;
+}
+
+// Shared 
+.button,
+.share-count {
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: @shr-button-border-radius;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+// Buttons 
+.button {
+    padding: (@shr-padding-base / 4) (@shr-padding-base / 2);
+    .button-styles();
+    box-shadow: 0 1px 1px rgba(0,0,0, .15);
+    text-shadow: 0 1px 1px rgba(0,0,0, .1);
+    color: @shr-button-text-color;
+    text-decoration: none;
+    user-select: none;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    
+    &:hover,
+    &:focus {
+        color: @shr-button-text-color;
+    }
+
+    &-facebook {
+        .button-styles(@shr-button-facebook-bg-color);
+    }
+    &-twitter {
+        .button-styles(@shr-button-twitter-bg-color);
+    }
+    &-pinterest {
+        .button-styles(@shr-button-pinterest-bg-color);
+    }
+    &-google {
+        .button-styles(@shr-button-google-bg-color);
+    }
+}
+
+// Count bubble
+.share-count {
+    position: relative;
+    margin-left: (@shr-padding-base / 2);
+    padding: (@shr-padding-base / 4) (@shr-padding-base / 3);
+    background: @shr-button-count-bg;
+    border: @shr-button-border-width solid @shr-button-count-border-color;
+    text-align: center;
+    min-width: 30px;
+    color: @shr-button-count-text-color;
+
+    &::before {
+        content: "";
+        position: absolute;
+        display: block;
+        width: @shr-button-count-arrow-size;
+        height: @shr-button-count-arrow-size;
+        left: @shr-button-border-width;
+        top: 50%;
+        margin-top: -(@shr-button-count-arrow-size / 2);
+
+        background: inherit;
+        border: inherit;
+        border-width: @shr-button-border-width 0 0 @shr-button-border-width;
+        transform: rotate(-45deg) translate(-50%, -50%);
+    }
+}
