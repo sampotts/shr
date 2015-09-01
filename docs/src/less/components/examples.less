@@ -4,9 +4,9 @@
 .examples {
 	display: inline-block;
 	vertical-align: middle;
-	padding: @padding-base (@padding-base * 2);
+	padding: @padding-base (@padding-base * 1.5);
 	margin-bottom: @padding-base;
-	background: rgba(255,255,255, .1);
+	background: #fff;
 	border-radius: 4px;
 	box-shadow: 0 1px 1px rgba(0,0,0, .1);
 	text-shadow: none;
@@ -22,8 +22,15 @@
 		margin-top: 0;
 		margin-bottom: 0;
 	}
-	.share-count {
-		border-color: #fff;
+	.button svg {
+		vertical-align: middle;
+		display: inline-block;
+		margin-right: 5px;
+		position: relative;
+		top: -2px;
+		width: 18px;
+		height: 18px;
+		fill: currentColor;
 	}
 
 	@media (min-width: @screen-sm) {

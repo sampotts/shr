@@ -17,10 +17,11 @@
 @shr-button-twitter-bg-color:   #0F94FF;
 @shr-button-google-bg-color:    #DE4C35;
 @shr-button-pinterest-bg-color: #CB2026;
+@shr-button-github-bg-color:    #F5F5F5;
 
 // Count
 @shr-button-count-bg:           #FFF;
-@shr-button-count-border-color: #DBE3E8;
+@shr-button-count-border-color: #D3DADE;
 @shr-button-count-text-color:   #55646B;
 @shr-button-count-arrow-size:   8px;
 
@@ -29,16 +30,34 @@
     background-image: linear-gradient(@background-color, darken(@background-color, 4%));
     background-color: @background-color;
     border: @shr-button-border-width solid darken(@background-color, 10%);
+    border-bottom-color: darken(@background-color, 15%);
+    .contrast-text-color(@background-color);
+    .contrast-text-shadow(@background-color);
 
     &:hover,
     &:focus {
         border-color: darken(@background-color, 15%);
+        .contrast-text-color(@background-color);
     }
+}
+// Contrast helpers
+.contrast-text-color(@background: "") when (lightness(@background) >= 65%) {
+    color: #333;
+}
+.contrast-text-color(@background: "") when (lightness(@background) < 65%) {
+    color: #FFF;
+}
+.contrast-text-shadow(@background: "") when (lightness(@background) >= 65%) {
+    text-shadow: 0 1px 1px rgba(255,255,255, .2);
+}
+.contrast-text-shadow(@background: "") when (lightness(@background) < 65%) {
+    text-shadow: 0 1px 1px rgba(0,0,0, .2);
 }
 
 // Button addon
 .button-addon + .button-addon,
-.button-addon + .button {
+.button-addon + .button,
+.button + .button-addon {
     margin-left: (@shr-padding-base / 2);
 }
 .button-addon {
@@ -59,18 +78,12 @@
 .button {
     padding: (@shr-padding-base / 4) (@shr-padding-base / 2);
     .button-styles();
-    box-shadow: 0 1px 1px rgba(0,0,0, .15);
-    text-shadow: 0 1px 1px rgba(0,0,0, .1);
+    box-shadow: 0 1px 1px rgba(0,0,0, .1);
     color: @shr-button-text-color;
     text-decoration: none;
     user-select: none;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    
-    &:hover,
-    &:focus {
-        color: @shr-button-text-color;
-    }
 
     &-facebook {
         .button-styles(@shr-button-facebook-bg-color);
@@ -83,6 +96,9 @@
     }
     &-google {
         .button-styles(@shr-button-google-bg-color);
+    }
+    &-github {
+        .button-styles(@shr-button-github-bg-color);
     }
 }
 

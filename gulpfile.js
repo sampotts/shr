@@ -15,6 +15,8 @@ var fs          = require("fs"),
     minify      = require("gulp-minify-css"),
     run         = require("run-sequence"),
     prefix      = require("gulp-autoprefixer"),
+    svgstore    = require("gulp-svgstore"),
+    svgmin      = require("gulp-svgmin"),
     rename      = require("gulp-rename"),
     s3          = require("gulp-s3"),
     gzip        = require("gulp-gzip"),
@@ -29,7 +31,8 @@ paths = {
         src: {
             less:       path.join(root, "src/less/**/*"),
             sass:       path.join(root, "src/sass/**/*"),
-            js:         path.join(root, "src/js/**/*")
+            js:         path.join(root, "src/js/**/*"),
+            sprite:     path.join(root, "src/sprite/*.svg")
         },
         // Output paths
         output:         path.join(root, "dist/")
@@ -118,6 +121,20 @@ var build = {
                 });
             })(key);
         }
+    },
+    sprite: function() {
+        // Process Icons
+        gulp.task("sprite", function () {
+            return gulp
+                .src(paths.shr.src.sprite)
+                .pipe(svgmin({
+                    plugins: [{
+                        removeDesc: true
+                    }]
+                }))
+                .pipe(svgstore())
+                .pipe(gulp.dest(paths.shr.output));
+        });
     }
 };
 
@@ -125,6 +142,7 @@ var build = {
 build.js(bundles.shr.js, "shr");
 build.less(bundles.shr.less, "shr");
 build.sass(bundles.shr.sass, "shr");
+build.sprite();
 
 // Docs files
 build.less(bundles.docs.less, "docs");
@@ -145,6 +163,7 @@ gulp.task("watch", function () {
     // Core
     gulp.watch(paths.shr.src.js, tasks.js);
     gulp.watch(paths.shr.src.less, tasks.less);
+    gulp.watch(paths.shr.src.sprite, ["sprite"]);
 
     // Docs
     gulp.watch(paths.docs.src.js, tasks.js);
@@ -153,7 +172,7 @@ gulp.task("watch", function () {
 
 // Default gulp task
 gulp.task("default", function(){
-    run(tasks.js, tasks.less, "watch");
+    run(tasks.js, tasks.less, "sprite", "watch");
 });
 
 // Publish a version to CDN and docs
@@ -235,5 +254,5 @@ gulp.task("open", function () {
 
 // Do everything 
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, "cdn", "docs");
+    run(tasks.js, tasks.less, "sprite", "cdn", "docs");
 });

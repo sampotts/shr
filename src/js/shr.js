@@ -1,6 +1,6 @@
 // ==========================================================================
 // Shr.js
-// shr v0.1.3
+// shr v0.1.4
 // https://github.com/selz/shr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -9,22 +9,30 @@
     'use strict';
 
     // Globals
-    var config;
+    var config, storage = { data: {}, ttl: 0 };
 
     // Default config
     var defaults = {
-        selector:           '[data-share]',     // Base selector for the share link
+        selector:           '[data-shr-network]',   // Base selector for the share link
         count: {
-            classname:      'share-count',      // Classname for the share count
-            displayZero:    true,               // Display zero values
-            format:         false,              // Display 1000 as 1K, 1000000 as 1M, etc
-            position:       'after',            // Inject the count before or after the link in the DOM
-            html:           function(count, classname) { return '<span class="' + classname + '">' + count + '</span>'; }
+            classname:      'share-count',          // Classname for the share count
+            displayZero:    true,                   // Display zero values
+            format:         false,                  // Display 1000 as 1K, 1000000 as 1M, etc
+            position:       'after',                // Inject the count before or after the link in the DOM
+            html:           function(count, classname) { return '<span class="' + classname + '">' + count + '</span>'; },
+            value: {
+                facebook:   'shares',
+                github:     'stargazers_count'
+            },
+            prefix: {
+                github:     'data'
+            }
         },
         urls: {
             facebook:       function(url) { return 'https://graph.facebook.com/?id=' + url; },        
             twitter:        function(url) { return 'https://cdn.api.twitter.com/1/urls/count.json?url=' + url; },
-            pinterest:      function(url) { return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url; }
+            pinterest:      function(url) { return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url; },
+            github:         function(repo, token) { return 'https://api.github.com/repos' + repo + '?access_token=' + token; }
         },
         popup: {
             google: {
@@ -43,6 +51,14 @@
                 width:      750,
                 height:     550
             }
+        },
+        tokens: {
+            github:         null
+        },
+        storage: {
+            key:            'shr',
+            enabled:        ('localStorage' in window && window.localStorage !== null),
+            ttl:            300000                  // 5 minutes in milliseconds
         }
     };
 
@@ -51,6 +67,22 @@
         if(config.debug && window.console) {
             console[(error ? 'error' : 'log')](text);
         }
+    }
+
+    // Is null or empty
+    function _isNullOrEmpty(string) {
+        return (typeof string === 'undefined' || string === null || !string.length);
+    }
+
+    // Format a number nicely (even in IE)
+    // http://stackoverflow.com/a/26506856/1191319
+    function _formatNumber(number) {
+        // Work out whether decimal separator is . or , for localised numbers
+        var decimalSeparator = (/\./.test((1.1).toLocaleString())? '.' : ',');
+
+        // Round n to an integer and present
+        var re = new RegExp('\\' + decimalSeparator + '\\d+$');
+        return Math.round(number).toLocaleString().replace(re,'');
     }
 
     // Toggle event
@@ -144,7 +176,7 @@
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
-    // Get JSONP
+    // Make a JSONP request
     function _getJSONP(url, callback) {
         // Generate a random callback
         var name = 'jsonp_callback_' + Math.round(100000 * Math.random());
@@ -164,46 +196,127 @@
         document.body.appendChild(script);
     }
 
-    // Parse share url from button href
-    function _parseUrl(shr) {
-        var href    = shr.link.getAttribute('href'),
-            query   = '';
+    // Get storage
+    function _getStorage() {
+        // Get the storage
+        if(config.storage.enabled && config.storage.key in window.localStorage) {
+            storage = {
+                data: JSON.parse(window.localStorage[config.storage.key]),
+                ttl: window.localStorage[config.storage.key + '_ttl']
+            };
+        }
+    }
 
-        // Get the query string containing the data
-        if(typeof href === 'string' && href.length) {
-            query = '?' + href.split('?')[1];
+    // Get storage
+    function _setStorage(data) {
+        if(!config.storage.enabled) {
+            return;
         }
 
+        // Store the result and set a TTL
+        window.localStorage[config.storage.key] = JSON.stringify(data);
+        window.localStorage[config.storage.key + '_ttl'] = (Date.now() + config.storage.ttl);
+    }
+
+    // Parse share url from button href
+    // https://gist.github.com/jlong/2428561
+    function _parseUrl(shr) {
         // Get the url based on the network
         switch(shr.network) {
             case 'facebook':
-                return _getParameterByName(query, 'u')
+                return _getParameterByName(shr.link.search, 'u');
+
+            case 'github':
+                return shr.link.pathname;
 
             default:
-                return _getParameterByName(query, 'url');
+                return _getParameterByName(shr.link.search, 'url');
+        }
+    }
+
+    // String format an endpoint URL for JSONP
+    function _formatUrl(shr) {
+        if(!(shr.network in config.urls)) {
+            return null;
+        }
+        switch(shr.network) {
+            case 'github':
+                if(_isNullOrEmpty(config.tokens.github)) {
+                    _log('GitHub API token is required', true);
+                    return null;
+                }
+
+                return config.urls[shr.network](_parseUrl(shr), config.tokens.github);
+
+            default:
+                return config.urls[shr.network](encodeURIComponent(shr.url))
         }
     }
 
     // Get the count for the url from API
     function _getCount(shr, callback) {
-        if(shr.network in config.urls) {
-            return _getJSONP(config.urls[shr.network](encodeURIComponent(shr.url)), callback);
+        if(config.storage.enabled) {
+            var key = _parseUrl(shr);
+
+            // Get from storage if it exists
+            if(key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
+                callback(storage.data[key][shr.network]);
+                return;
+            }
+        }
+
+        // Format the JSONP endpoint
+        var url = _formatUrl(shr);
+
+        // Make the request
+        if(!_isNullOrEmpty(url)) {
+            _getJSONP(url, function(data) {
+                // Cache in local storage (that expires)
+                if(config.storage.enabled) {
+                    // Create the initial object, if it's null
+                    if(!(key in storage.data)) {
+                        storage.data[key] = {};
+                    }
+
+                    // Add to storage
+                    storage.data[key][shr.network] = data;
+
+                    // Store the result
+                    _setStorage(storage.data);
+                }
+
+                callback(data);
+            });
+        }
+    }
+
+    // Get the value for count
+    function _prefixData(network, data) {
+        if(network in config.count.prefix) {
+            return data[config.count.prefix[network]];
         }
         else {
-            return false;
+            return data;
         }
     }
 
     // Display the count
     function _displayCount(shr, data) {
-        var count, display;
+        var count, display, 
+            custom = shr.link.getAttribute('data-shr-display');
 
-        switch(shr.network) {
-            case 'facebook': 
-                count = data.shares;
-                break;
-            default: 
-                count = data.count;
+        // Prefix data
+        // eg. GitHub uses data.data.forks, vs facebooks data.shares
+        data = _prefixData(shr.network, data);
+
+        if(!_isNullOrEmpty(custom)) {
+            count = data[custom];
+        }
+        else if(shr.network in config.count.value) {
+            count = data[config.count.value[shr.network]];
+        }
+        else {
+            count = data.count;
         }
 
         // Store count
@@ -218,7 +331,7 @@
             display = Math.round(shr.count / 1000) + 'K';
         }
         else {
-            display = shr.count.toLocaleString();
+            display = _formatNumber(shr.count);
         }
 
         // Only display if there's a count
@@ -232,7 +345,7 @@
         var shr = this;
 
         if(typeof link === 'undefined') {
-            _log('No share link found. Bailing.', true);
+            _log('No share link found.', true);
             return false;
         }
 
@@ -240,7 +353,7 @@
         shr.link = link;
 
         // Get the type (this is super important)
-        shr.network = link.getAttribute('data-share');
+        shr.network = link.getAttribute('data-shr-network');
 
         // Get the url we're sharing
         shr.url = _parseUrl(shr);
@@ -263,7 +376,10 @@
         config = _extend(defaults, options);
 
         // Get the links 
-        var elements    = document.querySelectorAll(config.selector);
+        var elements = document.querySelectorAll(config.selector);
+
+        // Get the storage
+        _getStorage();
 
         // Create a player instance for each element
         for (var i = elements.length - 1; i >= 0; i--) {

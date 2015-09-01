@@ -7,10 +7,11 @@ Simple, clean, customizable sharing buttons.
 The default share buttons used by the social networks are not only ugly to look at (sorry, they just are) but they usually depend on iframes and all sorts of other horrible, slow code. That led to creating shr (short for share).
 
 ## Features
-- **Accessible** - Proper elements for the job, using progressive enhancement.
+- **Accessible** - built right, using progressive enhancement.
 - **Lightweight** - just 1.4KB minified and gzipped.
 - **Customisable** - make the buttons and count look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. There's no `<span>` as button type hacks.
+- **Fast** - uses local storage to cache results to keep things fast.
 - **No dependencies** - written in vanilla JavaScript, no jQuery required. 
 
 Oh and yes, it works with Bootstrap. 
@@ -19,7 +20,6 @@ Oh and yes, it works with Bootstrap.
 Check out [the changelog](changelog.md)
 
 ## Planned development
-- Caching using local storage
 - More networks
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/shr/issues/new) or of course, forking and sending a pull request.
@@ -31,8 +31,8 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.shr.one/0.1.4/shr.css">
-<script src="https://cdn.shr.one/0.1.4/shr.js"></script>
+<link rel="stylesheet" href="https://cdn.shr.one/0.1.6/shr.css">
+<script src="https://cdn.shr.one/0.1.6/shr.js"></script>
 ```
 
 ### CSS
