@@ -1,13 +1,13 @@
 {
   "name": "shr",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Simple, customizable sharing buttons",
   "homepage": "http://shr.one",
   "main": "gulpfile.js",
   "dependencies": {},
   "devDependencies": {
-    "gulp": "^3.8.6",
-    "gulp-autoprefixer": "^0.0.8",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^3.0.2",
     "gulp-concat": "^2.3.3",
     "gulp-gzip": "^1.0.0",
     "gulp-less": "^1.3.1",
