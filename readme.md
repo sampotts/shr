@@ -8,7 +8,7 @@ The default share buttons used by the social networks are not only ugly to look 
 
 ## Features
 - **Accessible** - built right, using progressive enhancement.
-- **Lightweight** - just 1.4KB minified and gzipped.
+- **Lightweight** - just 1.9KB minified and gzipped.
 - **Customisable** - make the buttons and count look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. There's no `<span>` as button type hacks.
 - **Fast** - uses local storage to cache results to keep things fast.
