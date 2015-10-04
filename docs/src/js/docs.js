@@ -6,13 +6,7 @@
 
 // Setup the player
 shr.setup({
-	debug: 	true,
-	count: {
-		//position: 'before'
-	},
-	tokens: {
-		github: 'a46ac653210ba6a6be44260c29c333470c3fbbf5'
-	}
+	debug: 	true
 });
 
 // Google analytics 

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Shr.js
-// shr v0.1.4
+// shr v0.1.5
 // https://github.com/selz/shr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -32,7 +32,7 @@
             facebook:       function(url) { return 'https://graph.facebook.com/?id=' + url; },        
             twitter:        function(url) { return 'https://cdn.api.twitter.com/1/urls/count.json?url=' + url; },
             pinterest:      function(url) { return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url; },
-            github:         function(repo, token) { return 'https://api.github.com/repos' + repo + '?access_token=' + token; }
+            github:         function(repo, token) { return 'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : ''); }
         },
         popup: {
             google: {
@@ -52,14 +52,12 @@
                 height:     550
             }
         },
-        tokens: {
-            github:         null
-        },
         storage: {
             key:            'shr',
             enabled:        ('localStorage' in window && window.localStorage !== null),
             ttl:            300000                  // 5 minutes in milliseconds
-        }
+        },
+        tokens:             {}
     };
 
     // Debugging
@@ -241,11 +239,6 @@
         }
         switch(shr.network) {
             case 'github':
-                if(_isNullOrEmpty(config.tokens.github)) {
-                    _log('GitHub API token is required', true);
-                    return null;
-                }
-
                 return config.urls[shr.network](_parseUrl(shr), config.tokens.github);
 
             default:
