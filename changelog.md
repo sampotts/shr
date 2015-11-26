@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.8
+- Fix for Twitter removal of count
+
 ## v0.1.7
 - Made GitHub token optional
 

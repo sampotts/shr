@@ -12,9 +12,9 @@ The default share buttons used by the social networks are not only ugly to look 
 - **Customisable** - make the buttons and count look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. There's no `<span>` as button type hacks.
 - **Fast** - uses local storage to cache results to keep things fast.
-- **No dependencies** - written in vanilla JavaScript, no jQuery required. 
+- **No dependencies** - written in vanilla JavaScript, no jQuery required.
 
-Oh and yes, it works with Bootstrap. 
+Oh and yes, it works with Bootstrap.
 
 ## Changelog
 Check out [the changelog](changelog.md)
@@ -25,18 +25,18 @@ Check out [the changelog](changelog.md)
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/shr/issues/new) or of course, forking and sending a pull request.
 
 ## Implementation
-Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
+Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-### CDN 
+### CDN
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.shr.one/0.1.7/shr.css">
-<script src="https://cdn.shr.one/0.1.7/shr.js"></script>
+<link rel="stylesheet" href="https://cdn.shr.one/0.1.8/shr.css">
+<script src="https://cdn.shr.one/0.1.8/shr.js"></script>
 ```
 
 ### CSS
-If you want to use the default css, add the `shr.css` file from /dist into your head, or even better use `shr.less` or `shr.scss` file included in `/src` in your build to save a request. 
+If you want to use the default css, add the `shr.css` file from /dist into your head, or even better use `shr.less` or `shr.scss` file included in `/src` in your build to save a request.
 
 ```html
 <link rel="stylesheet" href="dist/shr.css">
