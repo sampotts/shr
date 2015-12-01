@@ -381,7 +381,7 @@
             }
 
             // Use default selector
-            elements = document.querySelectorAll(defaults.selectors.container);
+            elements = document.querySelectorAll(defaults.selector);
         }
 
         // Extend the default options with user specified
