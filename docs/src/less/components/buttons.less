@@ -4,14 +4,15 @@
 
 .button-large {
 	padding: (@padding-base / 2) @padding-base;
-	background: #fff;
-	color: @blue;
-	border: 0;
+	background: @blue;
+	color: #fff;
+	border-color: darken(@blue, 10%);
 	.font-size();
 	text-shadow: none;
 
 	&:hover,
 	&:focus {
-		color: @blue;
+		color: #fff;
+		border-color: darken(@blue, 15%);
 	}
 }

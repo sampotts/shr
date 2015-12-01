@@ -62,7 +62,7 @@
 
     // Debugging
     function _log(text, error) {
-        if(config.debug && window.console) {
+        if (config.debug && window.console) {
             console[(error ? 'error' : 'log')](text);
         }
     }
@@ -88,7 +88,7 @@
         var eventList = events.split(' ');
 
         // If a nodelist is passed, call itself on each node
-        if(element instanceof NodeList) {
+        if (element instanceof NodeList) {
             for (var x = 0; x < element.length; x++) {
                 if (element[x] instanceof Node) {
                     _toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
@@ -105,7 +105,7 @@
 
     // Bind event
     function _on(element, events, callback) {
-        if(element) {
+        if (element) {
             _toggleHandler(element, events, callback, true);
         }
     }
@@ -129,7 +129,7 @@
     // Popup window
     function _popup(event, shr) {
         // Only popup if we need to...
-        if(!(shr.network in config.popup)) {
+        if (!(shr.network in config.popup)) {
             return;
         }
 
@@ -144,7 +144,7 @@
             name    = shr.network;
 
         // If window already exists, just focus it
-        if(window['window-' + name] && !window['window-' + name].closed) {
+        if (window['window-' + name] && !window['window-' + name].closed) {
             window['window-' + name].focus();
         }
         else {
@@ -197,7 +197,7 @@
     // Get storage
     function _getStorage() {
         // Get the storage
-        if(config.storage.enabled && config.storage.key in window.localStorage) {
+        if (config.storage.enabled && config.storage.key in window.localStorage) {
             storage = {
                 data: JSON.parse(window.localStorage[config.storage.key]),
                 ttl: window.localStorage[config.storage.key + '_ttl']
@@ -207,7 +207,7 @@
 
     // Get storage
     function _setStorage(data) {
-        if(!config.storage.enabled) {
+        if (!config.storage.enabled) {
             return;
         }
 
@@ -234,7 +234,7 @@
 
     // String format an endpoint URL for JSONP
     function _formatUrl(shr) {
-        if(!(shr.network in config.urls)) {
+        if (!(shr.network in config.urls)) {
             return null;
         }
         switch(shr.network) {
@@ -248,11 +248,11 @@
 
     // Get the count for the url from API
     function _getCount(shr, callback) {
-        if(config.storage.enabled) {
+        if (config.storage.enabled) {
             var key = _parseUrl(shr);
 
             // Get from storage if it exists
-            if(key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
+            if (key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
                 callback(storage.data[key][shr.network]);
                 return;
             }
@@ -262,12 +262,12 @@
         var url = _formatUrl(shr);
 
         // Make the request
-        if(!_isNullOrEmpty(url)) {
+        if (!_isNullOrEmpty(url)) {
             _getJSONP(url, function(data) {
                 // Cache in local storage (that expires)
-                if(config.storage.enabled) {
+                if (config.storage.enabled) {
                     // Create the initial object, if it's null
-                    if(!(key in storage.data)) {
+                    if (!(key in storage.data)) {
                         storage.data[key] = {};
                     }
 
@@ -285,7 +285,7 @@
 
     // Get the value for count
     function _prefixData(network, data) {
-        if(network in config.count.prefix) {
+        if (network in config.count.prefix) {
             return data[config.count.prefix[network]];
         }
         else {
@@ -302,10 +302,10 @@
         // eg. GitHub uses data.data.forks, vs facebooks data.shares
         data = _prefixData(shr.network, data);
 
-        if(!_isNullOrEmpty(custom)) {
+        if (!_isNullOrEmpty(custom)) {
             count = data[custom];
         }
-        else if(shr.network in config.count.value) {
+        else if (shr.network in config.count.value) {
             count = data[config.count.value[shr.network]];
         }
         else {
@@ -317,10 +317,10 @@
         display = shr.count;
 
         // Format
-        if(config.count.format && shr.count > 1000000) {
+        if (config.count.format && shr.count > 1000000) {
             display = Math.round(shr.count / 1000000) + 'M';
         }
-        else if(config.count.format && shr.count > 1000) {
+        else if (config.count.format && shr.count > 1000) {
             display = Math.round(shr.count / 1000) + 'K';
         }
         else {
@@ -328,7 +328,7 @@
         }
 
         // Only display if there's a count
-        if(shr.count > 0 || config.count.displayZero) {
+        if (shr.count > 0 || config.count.displayZero) {
             shr.link.insertAdjacentHTML((config.count.position === 'after' ? 'afterend' : 'beforebegin'), config.count.html(display, config.count.classname));
         }
     }
@@ -337,7 +337,7 @@
     function Shr(link) {
         var shr = this;
 
-        if(typeof link === 'undefined') {
+        if (typeof link === 'undefined') {
             _log('No share link found.', true);
             return false;
         }
@@ -364,12 +364,29 @@
     }
 
     // Expose setup function
-    api.setup = function(options){
+    api.setup = function(elements, options) {
+        // Select the elements
+        // Assume elements is a NodeList by default
+        if (typeof elements === 'string') {
+            elements = document.querySelectorAll(elements);
+        }
+        // Single HTMLElement passed
+        else if (elements instanceof HTMLElement) {
+            elements = [elements];
+        }
+        // No selector passed, possibly options as first argument
+        else if (!(elements instanceof NodeList) && typeof elements !== 'string')  {
+            // If options are the first argument
+            if (typeof options === 'undefined' && typeof elements === 'object') {
+                options = elements;
+            }
+
+            // Use default selector
+            elements = document.querySelectorAll(defaults.selectors.container);
+        }
+
         // Extend the default options with user specified
         config = _extend(defaults, options);
-
-        // Get the links 
-        var elements = document.querySelectorAll(config.selector);
 
         // Get the storage
         _getStorage();
@@ -380,7 +397,7 @@
             var link = elements[i];
 
             // Setup a player instance and add to the element
-            if(typeof link.shr === 'undefined') { 
+            if (typeof link.shr === 'undefined') { 
                 // Create new instance
                 var instance = new Shr(link);
 
