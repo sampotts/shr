@@ -1,6 +1,6 @@
 {
   "name": "shr",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Simple, customizable sharing buttons",
   "homepage": "http://shr.one",
   "main": "gulpfile.js",

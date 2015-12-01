@@ -31,8 +31,8 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.shr.one/0.1.8/shr.css">
-<script src="https://cdn.shr.one/0.1.8/shr.js"></script>
+<link rel="stylesheet" href="https://cdn.shr.one/0.1.9/shr.css">
+<script src="https://cdn.shr.one/0.1.9/shr.js"></script>
 ```
 
 ### CSS
