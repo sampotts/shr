@@ -1,6 +1,6 @@
 // ==========================================================================
 // Shr.js
-// shr v0.1.7
+// shr v0.1.8
 // https://github.com/selz/shr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -29,22 +29,21 @@
             }
         },
         urls: {
-            facebook:       function(url) { return 'https://graph.facebook.com/?id=' + url; },        
-            twitter:        function(url) { return 'https://cdn.api.twitter.com/1/urls/count.json?url=' + url; },
+            facebook:       function(url) { return 'https://graph.facebook.com/?id=' + url; },
             pinterest:      function(url) { return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url; },
             github:         function(repo, token) { return 'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : ''); }
         },
         popup: {
             google: {
-                width:      500, 
+                width:      500,
                 height:     500
             },
             facebook: {
-                width:      640, 
+                width:      640,
                 height:     270
             },
             twitter: {
-                width:      640, 
+                width:      640,
                 height:     240
             },
             pinterest: {
@@ -118,7 +117,7 @@
             if (source[property] && source[property].constructor && source[property].constructor === Object) {
                 destination[property] = destination[property] || {};
                 _extend(destination[property], source[property]);
-            } 
+            }
             else {
                 destination[property] = source[property];
             }
@@ -170,7 +169,7 @@
 
         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
             results = regex.exec(query);
-        
+
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
@@ -295,7 +294,7 @@
 
     // Display the count
     function _displayCount(shr, data) {
-        var count, display, 
+        var count, display,
             custom = shr.link.getAttribute('data-shr-display');
 
         // Prefix data
@@ -358,7 +357,7 @@
         _on(shr.link, 'click', function(event) {
             _popup(event, shr);
         });
-        
+
         // Return the instance
         return shr;
     }
