@@ -1,6 +1,8 @@
 # Shr
 Simple, clean, customizable sharing buttons.
 
+[Donate to support Shr](#donate)
+
 [Checkout the demo](http://shr.one)
 
 ## Why?
@@ -87,6 +89,10 @@ If you find anything weird with Shr, please let us know using the GitHub issues 
 
 ## Author
 Shr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) from [@selz](https://twitter.com/selz) / [selz.com](http://selz.com)
+
+## Donate
+Shr costs money to run, not my time - I donate that for free but domains, CDN hosting and more. Any help is appreciated...
+[Donate to support Shr](https://www.paypal.me/pottsy/20usd)
 
 ## Copyright and License
 [The MIT license](license.md).
