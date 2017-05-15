@@ -11,7 +11,7 @@
         "Share buttons"
     ],
     "authors": [
-        "Sam Potts <me@sampotts.me>"
+        "Sam Potts <sam@potts.es>"
     ],
     "dependencies": {},
     "main": [
@@ -28,7 +28,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git://github.com/selz/shr.git"
+        "url": "git://github.com/sampotts/shr.git"
     },
     "license": "MIT"
 }

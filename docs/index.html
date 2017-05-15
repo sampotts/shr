@@ -6,53 +6,52 @@
         <meta name="description" content="Simple sharing buttons for social networks.">
         <meta name="author" content="Sam Potts">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
         <!-- Styles -->
-        <link rel="stylesheet" href="https://cdn.shr.one/0.1.9/shr.css">
-
+        <link rel="stylesheet" href="https://cdn.shr.one/1.0.0/shr.css">
         <!-- Docs styles -->
-        <link rel="stylesheet" href="https://cdn.shr.one/0.1.9/docs.css">
+        <link rel="stylesheet" href="https://cdn.shr.one/1.0.0/docs.css">
     </head>
     <body>
         <header>
             <h1>Shr</h1>
-            <p>Simple, clean, customizable sharing buttons by <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a> from <a href="https://twitter.com/selz" target="_blank">@selz</a></p>
+            <p>Simple, clean, customizable sharing buttons by <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a></p>
         </header>
-
         <main role="main" id="main">
             <div class="examples">
                 <span class="button-addon">
-                    <a href="https://github.com/selz/shr" target="_blank" class="button button-github" data-shr-network="github">
-                        <svg><use xlink:href="#shr-github"></use></svg>Star
-                    </a>
-                </span>
+                        <a href="https://github.com/sampotts/shr" target="_blank" class="button button-github" data-shr-network="github">
+                            <svg><use xlink:href="#shr-github"></use></svg>Star
+                        </a>
+                    </span>
                 <span class="button-addon">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fshr.one" target="_blank" class="button button-facebook" data-shr-network="facebook">
-                        <svg><use xlink:href="#shr-facebook"></use></svg>Share
-                    </a>
-                </span>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fshr.one" target="_blank" class="button button-facebook" data-shr-network="facebook">
+                            <svg><use xlink:href="#shr-facebook"></use></svg>Share
+                        </a>
+                    </span>
                 <a href="https://twitter.com/intent/tweet?text=Simple+sharing+buttons+for+social+networks.&amp;url=https%3A%2F%2Fshr.one&amp;via=sam_potts" target="_blank" class="button button-twitter" data-shr-network="twitter">
-                    <svg><use xlink:href="#shr-twitter"></use></svg>Tweet
+                    <svg>
+                        <use xlink:href="#shr-twitter"></use>
+                    </svg>Tweet
                 </a>
                 <span class="button-addon">
-                    <a href="http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fshr.one&amp;media=http%3A%2F%2Fplacehold.it%2F500x500&amp;description=Simple+sharing+buttons+for+social+networks." target="_blank" class="button button-pinterest" data-shr-network="pinterest">
-                        <svg><use xlink:href="#shr-pinterest"></use></svg>Pin it
-                    </a>
-                </span>
+                        <a href="http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fshr.one&amp;media=http%3A%2F%2Fplacehold.it%2F500x500&amp;description=Simple+sharing+buttons+for+social+networks." target="_blank" class="button button-pinterest" data-shr-network="pinterest">
+                            <svg><use xlink:href="#shr-pinterest"></use></svg>Pin it
+                        </a>
+                    </span>
                 <a href="https://plus.google.com/share?url=https%3A%2F%2Fshr.one" target="_blank" class="button button-google" data-shr-network="google">
-                    <svg><use xlink:href="#shr-google"></use></svg>+1
+                    <svg>
+                        <use xlink:href="#shr-google"></use>
+                    </svg>+1
                 </a>
             </div>
         </main>
-
         <aside>
-            <a href="https://github.com/selz/shr" target="_blank" class="button button-large">Download on GitHub</a>
+            <a href="https://github.com/sampotts/shr" target="_blank" class="button button-large">Download on GitHub</a>
         </aside>
-
         <!-- Load SVG defs -->
         <!-- You should bundle all SVG/Icons into one file using a build tool such as gulp and svg store -->
         <script>
-        (function(d, u){
+        (function(d, u) {
             var x = new XMLHttpRequest(),
                 b = d.body;
 
@@ -63,28 +62,25 @@
                 x.open("GET", u, true);
             }
             // XDomainRequest for older IE
-            else if(typeof XDomainRequest != "undefined") {
+            else if (typeof XDomainRequest != "undefined") {
                 x = new XDomainRequest();
                 x.open("GET", u);
-            }
-            else {
+            } else {
                 return;
             }
 
             x.send();
-            x.onload = function(){
+            x.onload = function() {
                 var c = d.createElement("div");
                 c.setAttribute("hidden", "");
                 c.innerHTML = x.responseText;
                 b.insertBefore(c, b.childNodes[0]);
             }
-        })(document, "https://cdn.shr.one/0.1.9/sprite.svg");
+        })(document, "https://cdn.shr.one/1.0.0/sprite.svg");
         </script>
-
         <!-- Shr core script -->
-        <script src="https://cdn.shr.one/0.1.9/shr.js"></script>
-
+        <script src="https://cdn.shr.one/1.0.0/shr.js?v=2"></script>
         <!-- Docs script -->
-        <script src="https://cdn.shr.one/0.1.9/docs.js"></script>
+        <script src="https://cdn.shr.one/1.0.0/docs.js"></script>
     </body>
 </html>

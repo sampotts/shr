@@ -24,7 +24,7 @@ Check out [the changelog](changelog.md)
 ## Planned development
 - More networks
 
-If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/shr/issues/new) or of course, forking and sending a pull request.
+If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/sampotts/shr/issues/new) or of course, forking and sending a pull request.
 
 ## Implementation
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
@@ -33,8 +33,8 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.shr.one/0.1.9/shr.css">
-<script src="https://cdn.shr.one/0.1.9/shr.js"></script>
+<link rel="stylesheet" href="https://cdn.shr.one/1.0.0/shr.css">
+<script src="https://cdn.shr.one/1.0.0/shr.js"></script>
 ```
 
 ### CSS
@@ -88,7 +88,7 @@ TBC
 If you find anything weird with Shr, please let us know using the GitHub issues tracker.
 
 ## Author
-Shr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) from [@selz](https://twitter.com/selz) / [selz.com](http://selz.com)
+Shr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me)
 
 ## Donate
 Shr costs money to run, not my time - I donate that for free but domains, hosting and more. Any help is appreciated...
@@ -97,7 +97,7 @@ Shr costs money to run, not my time - I donate that for free but domains, hostin
 ## Thanks
 [![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
 
-Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services. 
+Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
 
 ## Copyright and License
 [The MIT license](license.md).
