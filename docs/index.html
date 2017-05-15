@@ -52,8 +52,8 @@
         <!-- You should bundle all SVG/Icons into one file using a build tool such as gulp and svg store -->
         <script>
         (function(d, u) {
-            var x = new XMLHttpRequest(),
-                b = d.body;
+            var x = new XMLHttpRequest();
+            var b = d.body;
 
             // Check for CORS support
             // If you're loading from same domain, you can remove the if statement
@@ -76,11 +76,11 @@
                 c.innerHTML = x.responseText;
                 b.insertBefore(c, b.childNodes[0]);
             }
-        })(document, "https://cdn.shr.one/1.0.0/sprite.svg");
+        })(document, "../dist/sprite.svg");
         </script>
         <!-- Shr core script -->
-        <script src="https://cdn.shr.one/1.0.0/shr.js?v=2"></script>
+        <script src="../dist/shr.js"></script>
         <!-- Docs script -->
-        <script src="https://cdn.shr.one/1.0.0/docs.js"></script>
+        <script src="dist/docs.js"></script>
     </body>
 </html>

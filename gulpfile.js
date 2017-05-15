@@ -24,43 +24,43 @@ var replace = require("gulp-replace");
 var open = require("gulp-open");
 var size = require("gulp-size");
 
-var root = __dirname,
-    paths = {
-        shr: {
-            // Source paths
-            src: {
-                less: path.join(root, "src/less/**/*"),
-                sass: path.join(root, "src/sass/**/*"),
-                js: path.join(root, "src/js/**/*"),
-                sprite: path.join(root, "src/sprite/*.svg")
-            },
-            // Output paths
-            output: path.join(root, "dist/")
+var root = __dirname;
+var paths = {
+    shr: {
+        // Source paths
+        src: {
+            less: path.join(root, "src/less/**/*"),
+            sass: path.join(root, "src/sass/**/*"),
+            js: path.join(root, "src/js/**/*"),
+            sprite: path.join(root, "src/sprite/*.svg")
         },
-        docs: {
-            // Source paths
-            src: {
-                less: path.join(root, "docs/src/less/**/*"),
-                js: path.join(root, "docs/src/js/**/*"),
-            },
-            // Output paths
-            output: path.join(root, "docs/dist/"),
-            // Docs
-            root: path.join(root, "docs/")
+        // Output paths
+        output: path.join(root, "dist/")
+    },
+    docs: {
+        // Source paths
+        src: {
+            less: path.join(root, "docs/src/less/**/*"),
+            js: path.join(root, "docs/src/js/**/*"),
         },
-        upload: [path.join(root, "dist/**"), path.join(root, "docs/dist/**")]
+        // Output paths
+        output: path.join(root, "docs/dist/"),
+        // Docs
+        root: path.join(root, "docs/")
     },
+    upload: [path.join(root, "dist/**"), path.join(root, "docs/dist/**")]
+};
 
-    // Task arrays
-    tasks = {
-        less: [],
-        sass: [],
-        js: []
-    },
+// Task arrays
+var tasks = {
+    less: [],
+    sass: [],
+    js: []
+};
 
-    // Fetch bundles from JSON
-    bundles = loadJSON(path.join(root, "bundles.json")),
-    package = loadJSON(path.join(root, "package.json"));
+// Fetch bundles from JSON
+var bundles = loadJSON(path.join(root, "bundles.json"));
+var package = loadJSON(path.join(root, "package.json"));
 
 // Load json
 function loadJSON(path) {
@@ -202,7 +202,14 @@ var options = {
         gzippedOnly: true
     }
 };
-var cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)", "gi");
+
+// If aws is setup
+if ("cdn" in aws) {
+    var regex = "(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)";
+    var cdnpath = new RegExp(aws.cdn.domain + "\/" + regex, "gi");
+    var semver = new RegExp("v" + regex, "gi");
+    var localpath = new RegExp("(\.\.\/)?dist", "gi");
+}
 
 // Publish version to CDN bucket
 gulp.task("cdn", function() {
@@ -227,18 +234,19 @@ gulp.task("docs", function() {
 
     // Replace versioned files in readme.md
     gulp.src([root + "/readme.md"])
-        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+        .pipe(replace(cdnpath, aws.cdn.domain + "/" + version))
         .pipe(gulp.dest(root));
 
     // Replace versioned files in *.html
+    // e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
     gulp.src([paths.docs.root + "*.html"])
-        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
-        .pipe(gulp.dest(paths.docs.root))
+        .pipe(replace(localpath, "https://" + aws.cdn.domain + "/" + version))
         .pipe(gzip())
         .pipe(s3(aws.docs, options.docs));
 
     // Upload error.html to cdn using docs options
     gulp.src([paths.docs.root + "error.html"])
+        .pipe(replace(localpath, "https://" + aws.cdn.domain + "/" + version))
         .pipe(gzip())
         .pipe(s3(aws.cdn, options.docs));
 });
