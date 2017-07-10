@@ -4,63 +4,63 @@
 /*global require, __dirname*/
 /*jshint -W079 */
 
-var fs          = require("fs"),
-    path        = require("path"),
-    gulp        = require("gulp"),
-    gutil       = require("gulp-util"),
-    concat      = require("gulp-concat"),
-    uglify      = require("gulp-uglify"),
-    less        = require("gulp-less"),
-    sass        = require("gulp-sass"),
-    minify      = require("gulp-minify-css"),
-    run         = require("run-sequence"),
-    prefix      = require("gulp-autoprefixer"),
-    svgstore    = require("gulp-svgstore"),
-    svgmin      = require("gulp-svgmin"),
-    rename      = require("gulp-rename"),
-    s3          = require("gulp-s3"),
-    gzip        = require("gulp-gzip"),
-    replace     = require("gulp-replace"),
-    open        = require("gulp-open"),
-    size        = require("gulp-size");
+var fs = require("fs");
+var path = require("path");
+var gulp = require("gulp");
+var gutil = require("gulp-util");
+var concat = require("gulp-concat");
+var uglify = require("gulp-uglify");
+var less = require("gulp-less");
+var sass = require("gulp-sass");
+var minify = require("gulp-minify-css");
+var run = require("run-sequence");
+var prefix = require("gulp-autoprefixer");
+var svgstore = require("gulp-svgstore");
+var svgmin = require("gulp-svgmin");
+var rename = require("gulp-rename");
+var s3 = require("gulp-s3");
+var gzip = require("gulp-gzip");
+var replace = require("gulp-replace");
+var open = require("gulp-open");
+var size = require("gulp-size");
 
-var root = __dirname,
-paths = {
+var root = __dirname;
+var paths = {
     shr: {
         // Source paths
         src: {
-            less:       path.join(root, "src/less/**/*"),
-            sass:       path.join(root, "src/sass/**/*"),
-            js:         path.join(root, "src/js/**/*"),
-            sprite:     path.join(root, "src/sprite/*.svg")
+            less: path.join(root, "src/less/**/*"),
+            sass: path.join(root, "src/sass/**/*"),
+            js: path.join(root, "src/js/**/*"),
+            sprite: path.join(root, "src/sprite/*.svg")
         },
         // Output paths
-        output:         path.join(root, "dist/")
+        output: path.join(root, "dist/")
     },
     docs: {
         // Source paths
         src: {
-            less:       path.join(root, "docs/src/less/**/*"),
-            js:         path.join(root, "docs/src/js/**/*"),
+            less: path.join(root, "docs/src/less/**/*"),
+            js: path.join(root, "docs/src/js/**/*"),
         },
         // Output paths
-        output:         path.join(root, "docs/dist/"),
+        output: path.join(root, "docs/dist/"),
         // Docs
-        root:           path.join(root, "docs/")
+        root: path.join(root, "docs/")
     },
     upload: [path.join(root, "dist/**"), path.join(root, "docs/dist/**")]
-},
+};
 
 // Task arrays
-tasks = {    
-    less:   [],
-    sass:   [],
-    js:     []
-},
+var tasks = {
+    less: [],
+    sass: [],
+    js: []
+};
 
 // Fetch bundles from JSON
-bundles = loadJSON(path.join(root, "bundles.json")),
-package = loadJSON(path.join(root, "package.json"));
+var bundles = loadJSON(path.join(root, "bundles.json"));
+var package = loadJSON(path.join(root, "package.json"));
 
 // Load json
 function loadJSON(path) {
@@ -68,13 +68,13 @@ function loadJSON(path) {
 }
 
 var build = {
-    js: function (files, bundle) {
+    js: function(files, bundle) {
         for (var key in files) {
             (function(key) {
                 var name = "js-" + key;
                 tasks.js.push(name);
 
-                gulp.task(name, function () {
+                gulp.task(name, function() {
                     return gulp
                         .src(bundles[bundle].js[key])
                         .pipe(concat(key))
@@ -86,17 +86,19 @@ var build = {
     },
     less: function(files, bundle) {
         for (var key in files) {
-            (function (key) {       
+            (function(key) {
                 var name = "less-" + key;
                 tasks.less.push(name);
 
-                gulp.task(name, function () {
+                gulp.task(name, function() {
                     return gulp
                         .src(bundles[bundle].less[key])
                         .pipe(less())
                         .on("error", gutil.log)
                         .pipe(concat(key))
-                        .pipe(prefix(["last 2 versions"], { cascade: true }))
+                        .pipe(prefix(["last 2 versions"], {
+                            cascade: true
+                        }))
                         .pipe(minify())
                         .pipe(gulp.dest(paths[bundle].output));
                 });
@@ -105,17 +107,19 @@ var build = {
     },
     sass: function(files, bundle) {
         for (var key in files) {
-            (function (key) {       
+            (function(key) {
                 var name = "sass-" + key;
                 tasks.sass.push(name);
 
-                gulp.task(name, function () {
+                gulp.task(name, function() {
                     return gulp
                         .src(bundles[bundle].sass[key])
                         .pipe(sass())
                         .on("error", gutil.log)
                         .pipe(concat(key))
-                        .pipe(prefix(["last 2 versions"], { cascade: true }))
+                        .pipe(prefix(["last 2 versions"], {
+                            cascade: true
+                        }))
                         .pipe(minify())
                         .pipe(gulp.dest(paths[bundle].output));
                 });
@@ -124,7 +128,7 @@ var build = {
     },
     sprite: function() {
         // Process Icons
-        gulp.task("sprite", function () {
+        gulp.task("sprite", function() {
             return gulp
                 .src(paths.shr.src.sprite)
                 .pipe(svgmin({
@@ -149,17 +153,17 @@ build.less(bundles.docs.less, "docs");
 build.js(bundles.docs.js, "docs");
 
 // Build all JS (inc. templates)
-gulp.task("js", function(){
+gulp.task("js", function() {
     run(tasks.js);
 });
 
 // Build SASS (for testing, default is LESS)
-gulp.task("sass", function(){
+gulp.task("sass", function() {
     run(tasks.sass);
 });
 
 // Watch for file changes
-gulp.task("watch", function () {
+gulp.task("watch", function() {
     // Core
     gulp.watch(paths.shr.src.js, tasks.js);
     gulp.watch(paths.shr.src.less, tasks.less);
@@ -171,7 +175,7 @@ gulp.task("watch", function () {
 });
 
 // Default gulp task
-gulp.task("default", function(){
+gulp.task("default", function() {
     run(tasks.js, tasks.less, "sprite", "watch");
 });
 
@@ -179,10 +183,10 @@ gulp.task("default", function(){
 // --------------------------------------------
 
 // Some options
-var aws = loadJSON(path.join(root, "aws.json")),
-version = package.version,
-maxAge  = 31536000, // seconds 1 year
-options = {
+var aws = loadJSON(path.join(root, "aws.json"));
+var version = package.version;
+var maxAge = 31536000; // seconds 1 year
+var options = {
     cdn: {
         headers: {
             "Cache-Control": "max-age=" + maxAge,
@@ -197,20 +201,27 @@ options = {
         },
         gzippedOnly: true
     }
-},
-cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
+};
+
+// If aws is setup
+if ("cdn" in aws) {
+    var regex = "(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)";
+    var cdnpath = new RegExp(aws.cdn.domain + "\/" + regex, "gi");
+    var semver = new RegExp("v" + regex, "gi");
+    var localpath = new RegExp("(\.\.\/)?dist", "gi");
+}
 
 // Publish version to CDN bucket
-gulp.task("cdn", function () {
+gulp.task("cdn", function() {
     console.log("Uploading " + version + " to " + aws.cdn.bucket);
 
-    // Upload to CDN 
+    // Upload to CDN
     gulp.src(paths.upload)
         .pipe(size({
             showFiles: true,
             gzip: true
         }))
-        .pipe(rename(function (path) {
+        .pipe(rename(function(path) {
             path.dirname = path.dirname.replace(".", version);
         }))
         .pipe(gzip())
@@ -218,29 +229,30 @@ gulp.task("cdn", function () {
 });
 
 // Publish to Docs bucket
-gulp.task("docs", function () {
+gulp.task("docs", function() {
     console.log("Uploading " + version + " docs to " + aws.docs.bucket);
 
     // Replace versioned files in readme.md
     gulp.src([root + "/readme.md"])
-        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+        .pipe(replace(cdnpath, aws.cdn.domain + "/" + version))
         .pipe(gulp.dest(root));
 
     // Replace versioned files in *.html
+    // e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
     gulp.src([paths.docs.root + "*.html"])
-        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
-        .pipe(gulp.dest(paths.docs.root))
+        .pipe(replace(localpath, "https://" + aws.cdn.domain + "/" + version))
         .pipe(gzip())
         .pipe(s3(aws.docs, options.docs));
 
     // Upload error.html to cdn using docs options
     gulp.src([paths.docs.root + "error.html"])
+        .pipe(replace(localpath, "https://" + aws.cdn.domain + "/" + version))
         .pipe(gzip())
         .pipe(s3(aws.cdn, options.docs));
 });
 
 // Open the docs site to check it's sweet
-gulp.task("open", function () {
+gulp.task("open", function() {
     console.log("Opening " + aws.docs.bucket + "...");
 
     // A file must be specified or gulp will skip the task
@@ -252,7 +264,7 @@ gulp.task("open", function () {
         }));
 });
 
-// Do everything 
-gulp.task("publish", function () {
+// Do everything
+gulp.task("publish", function() {
     run(tasks.js, tasks.less, "sprite", "cdn", "docs");
 });

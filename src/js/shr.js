@@ -1,7 +1,7 @@
 // ==========================================================================
 // Shr.js
 // shr v0.1.9
-// https://github.com/selz/shr
+// https://github.com/sampotts/shr
 // License: The MIT License (MIT)
 // ==========================================================================
 
@@ -9,7 +9,11 @@
     'use strict';
 
     // Globals
-    var config, storage = { data: {}, ttl: 0 };
+    var config;
+    var storage = {
+        data: {},
+        ttl: 0
+    };
 
     // Default config
     var defaults = {
@@ -61,18 +65,39 @@
         },
         storage: {
             key: 'shr',
-            enabled: ('localStorage' in window && window.localStorage !== null),
+            enabled: (function() {
+                if ('localStorage' in window && window.localStorage !== null) {
+                    return false;
+                }
+
+                // Try to use it (it might be disabled, e.g. user is in private/porn mode)
+                // see: https://github.com/Selz/plyr/issues/131
+                try {
+                    // Add test item
+                    window.localStorage.setItem('___test', 'OK');
+
+                    // Get the test item
+                    var result = window.localStorage.getItem('___test');
+
+                    // Clean up
+                    window.localStorage.removeItem('___test');
+
+                    // Check if value matches
+                    return (result === 'OK');
+                } catch (e) {
+                    return false;
+                }
+
+                return false;
+            })(),
             ttl: 300000 // 5 minutes in milliseconds
         },
         tokens: {}
     };
 
     // Debugging
-    function log(text, error) {
-        if (config.debug && window.console) {
-            console[(error ? 'error' : 'log')](text);
-        }
-    }
+    var log = function() {};
+    var error = function() {};
 
     // Is null or empty
     function isNullOrEmpty(string) {
@@ -273,8 +298,10 @@
                     return;
                 }
             }
+        }
 
-            // Make the request
+        // Make the request
+        if (!isNullOrEmpty(url)) {
             getJSONP(url, function(data) {
                 // Cache in local storage (that expires)
                 if (config.storage.enabled) {
@@ -306,7 +333,8 @@
 
     // Display the count
     function displayCount(shr, data) {
-        var count, display;
+        var count;
+        var display;
         var custom = shr.link.getAttribute('data-shr-display');
 
         // Prefix data
@@ -345,7 +373,7 @@
         var shr = this;
 
         if (typeof link === 'undefined') {
-            log('No share link found.', true);
+            error('No share link found.');
             return false;
         }
 
@@ -359,7 +387,9 @@
         shr.url = parseUrl(shr);
 
         // Get the share count
-        getCount(shr, function(data) { displayCount(shr, data); });
+        getCount(shr, function(data) {
+            displayCount(shr, data);
+        });
 
         // Listen for events
         on(shr.link, 'click', function(event) {
@@ -412,6 +442,11 @@
                 link.shr = (Object.keys(instance).length ? instance : false);
             }
         }
-    }
 
+        // Debugging
+        if (config.debug && window.console) {
+            log = window.console.log.bind(console);
+            error = window.console.error.bind(console);
+        }
+    }
 }(this.shr = this.shr || {}));

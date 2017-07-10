@@ -10,7 +10,7 @@
     "couch"         : false,
     "wsh"           : true,   // Windows Scripting Host.
     "jquery"        : true,
-    "predef"        : [ "jQuery", "$" ],
+    "predef"        : [ ],
 
     // Development.
     "debug"         : false,  // Allow debugger statements e.g. browser breakpoints.

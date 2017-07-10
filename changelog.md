@@ -1,7 +1,13 @@
 # Changelog
 
-## v0.1.10
+## v1.0.2
 - Security fix
+
+## v1.0.1
+- Bug fix related to debugging
+
+## v1.0.0
+- Repo move
 
 ## v0.1.9
 - Bug fix
