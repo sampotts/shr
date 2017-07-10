@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.10
+- Security fix
+
 ## v0.1.9
 - Bug fix
 

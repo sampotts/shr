@@ -5,7 +5,7 @@
 // License: The MIT License (MIT)
 // ==========================================================================
 
-(function (api) {
+(function(api) {
     'use strict';
 
     // Globals
@@ -13,84 +13,92 @@
 
     // Default config
     var defaults = {
-        selector:           '[data-shr-network]',   // Base selector for the share link
+        selector: '[data-shr-network]', // Base selector for the share link
         count: {
-            classname:      'share-count',          // Classname for the share count
-            displayZero:    true,                   // Display zero values
-            format:         false,                  // Display 1000 as 1K, 1000000 as 1M, etc
-            position:       'after',                // Inject the count before or after the link in the DOM
-            html:           function(count, classname) { return '<span class="' + classname + '">' + count + '</span>'; },
+            classname: 'share-count', // Classname for the share count
+            displayZero: true, // Display zero values
+            format: false, // Display 1000 as 1K, 1000000 as 1M, etc
+            position: 'after', // Inject the count before or after the link in the DOM
+            html: function(count, classname) {
+                return '<span class="' + classname + '">' + count + '</span>';
+            },
             value: {
-                facebook:   'shares',
-                github:     'stargazers_count'
+                facebook: 'shares',
+                github: 'stargazers_count'
             },
             prefix: {
-                github:     'data'
+                github: 'data'
             }
         },
         urls: {
-            facebook:       function(url) { return 'https://graph.facebook.com/?id=' + url; },
-            pinterest:      function(url) { return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url; },
-            github:         function(repo, token) { return 'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : ''); }
+            facebook: function(url) {
+                return 'https://graph.facebook.com/?id=' + url;
+            },
+            pinterest: function(url) {
+                return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
+            },
+            github: function(repo, token) {
+                return 'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '');
+            }
         },
         popup: {
             google: {
-                width:      500,
-                height:     500
+                width: 500,
+                height: 500
             },
             facebook: {
-                width:      640,
-                height:     270
+                width: 640,
+                height: 270
             },
             twitter: {
-                width:      640,
-                height:     240
+                width: 640,
+                height: 240
             },
             pinterest: {
-                width:      750,
-                height:     550
+                width: 750,
+                height: 550
             }
         },
         storage: {
-            key:            'shr',
-            enabled:        ('localStorage' in window && window.localStorage !== null),
-            ttl:            300000                  // 5 minutes in milliseconds
+            key: 'shr',
+            enabled: ('localStorage' in window && window.localStorage !== null),
+            ttl: 300000 // 5 minutes in milliseconds
         },
-        tokens:             {}
+        tokens: {}
     };
 
     // Debugging
-    function _log(text, error) {
+    function log(text, error) {
         if (config.debug && window.console) {
             console[(error ? 'error' : 'log')](text);
         }
     }
 
     // Is null or empty
-    function _isNullOrEmpty(string) {
+    function isNullOrEmpty(string) {
         return (typeof string === 'undefined' || string === null || !string.length);
     }
 
     // Format a number nicely (even in IE)
     // http://stackoverflow.com/a/26506856/1191319
-    function _formatNumber(number) {
+    function formatNumber(number) {
         // Work out whether decimal separator is . or , for localised numbers
-        var decimalSeparator = (/\./.test((1.1).toLocaleString())? '.' : ',');
+        var decimalSeparator = (/\./.test((1.1).toLocaleString()) ? '.' : ',');
 
         // Round n to an integer and present
         var re = new RegExp('\\' + decimalSeparator + '\\d+$');
-        return Math.round(number).toLocaleString().replace(re,'');
+        return Math.round(number).toLocaleString().replace(re, '');
     }
 
     // Toggle event
-    function _toggleHandler(element, events, callback, toggle) {
+    function toggleHandler(element, events, callback, toggle) {
         var eventList = events.split(' ');
 
         // If a nodelist is passed, call itself on each node
         if (element instanceof NodeList) {
             for (var x = 0; x < element.length; x++) {
                 if (element[x] instanceof Node) {
-                    _toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
+                    toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
                 }
             }
             return;
@@ -103,22 +111,21 @@
     }
 
     // Bind event
-    function _on(element, events, callback) {
+    function on(element, events, callback) {
         if (element) {
-            _toggleHandler(element, events, callback, true);
+            toggleHandler(element, events, callback, true);
         }
     }
 
     // Deep extend/merge two Objects
     // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
     // Removed call to arguments.callee (used explicit function name instead)
-    function _extend(destination, source) {
+    function extend(destination, source) {
         for (var property in source) {
             if (source[property] && source[property].constructor && source[property].constructor === Object) {
                 destination[property] = destination[property] || {};
-                _extend(destination[property], source[property]);
-            }
-            else {
+                extend(destination[property], source[property]);
+            } else {
                 destination[property] = source[property];
             }
         }
@@ -126,7 +133,7 @@
     }
 
     // Popup window
-    function _popup(event, shr) {
+    function popup(event, shr) {
         // Only popup if we need to...
         if (!(shr.network in config.popup)) {
             return;
@@ -136,45 +143,48 @@
         event.preventDefault();
 
         // Set variables for the popup
-        var size    = config.popup[shr.network],
-            url     = shr.link.href,
-            width   = size.width,
-            height  = size.height,
-            name    = shr.network;
+        var size = config.popup[shr.network];
+        var url = shr.link.href;
+        var width = size.width;
+        var height = size.height;
+        var name = 'window-' + shr.network;
 
         // If window already exists, just focus it
-        if (window['window-' + name] && !window['window-' + name].closed) {
-            window['window-' + name].focus();
-        }
-        else {
+        if (window[name] && !window[name].closed) {
+            window[name].focus();
+        } else {
             // Get position
-            var left    = (window.screenLeft !== undefined ? window.screenLeft : screen.left);
-            var top     = (window.screenTop !== undefined ? window.screenTop : screen.top);
+            var left = (window.screenLeft !== undefined ? window.screenLeft : screen.left);
+            var top = (window.screenTop !== undefined ? window.screenTop : screen.top);
 
             // Open in the centre of the screen
-            var x       = (screen.width / 2) - (width / 2) + left,
-                y       = (screen.height / 2) - (height / 2) + top;
+            var x = (screen.width / 2) - (width / 2) + left;
+            var y = (screen.height / 2) - (height / 2) + top;
 
             // Open that window
-            window['window-' + name] = window.open(url, name, 'top=' + y +',left='+ x +',width=' + width + ',height=' + height);
+            window[name] = window.open(url, shr.network, 'top=' + y + ',left=' + x + ',width=' + width + ',height=' + height);
 
             // Focus new window
-            window['window-' + name].focus();
+            window[name].focus();
         }
+
+        // Nullify opener to prevent "tab nabbing"
+        // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
+        window[name].opener = null;
     }
 
     // Get URL parameter by name
-    function _getParameterByName(query, name) {
+    function getParameterByName(query, name) {
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
 
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
-            results = regex.exec(query);
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(query);
 
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
     // Make a JSONP request
-    function _getJSONP(url, callback) {
+    function getJSONP(url, callback) {
         // Generate a random callback
         var name = 'jsonp_callback_' + Math.round(100000 * Math.random());
 
@@ -194,7 +204,7 @@
     }
 
     // Get storage
-    function _getStorage() {
+    function getStorage() {
         // Get the storage
         if (config.storage.enabled && config.storage.key in window.localStorage) {
             storage = {
@@ -205,7 +215,7 @@
     }
 
     // Get storage
-    function _setStorage(data) {
+    function setStorage(data) {
         if (!config.storage.enabled) {
             return;
         }
@@ -217,52 +227,55 @@
 
     // Parse share url from button href
     // https://gist.github.com/jlong/2428561
-    function _parseUrl(shr) {
+    function parseUrl(shr) {
         // Get the url based on the network
-        switch(shr.network) {
+        switch (shr.network) {
             case 'facebook':
-                return _getParameterByName(shr.link.search, 'u');
+                return getParameterByName(shr.link.search, 'u');
 
             case 'github':
                 return shr.link.pathname;
 
             default:
-                return _getParameterByName(shr.link.search, 'url');
+                return getParameterByName(shr.link.search, 'url');
         }
     }
 
     // String format an endpoint URL for JSONP
-    function _formatUrl(shr) {
-        if (!(shr.network in config.urls)) {
-            return null;
-        }
-        switch(shr.network) {
-            case 'github':
-                return config.urls[shr.network](_parseUrl(shr), config.tokens.github);
+    function formatUrl(shr) {
+        if (shr.network in config.urls) {
+            switch (shr.network) {
+                case 'github':
+                    return config.urls[shr.network](parseUrl(shr), config.tokens.github);
 
-            default:
-                return config.urls[shr.network](encodeURIComponent(shr.url))
-        }
-    }
-
-    // Get the count for the url from API
-    function _getCount(shr, callback) {
-        if (config.storage.enabled) {
-            var key = _parseUrl(shr);
-
-            // Get from storage if it exists
-            if (key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
-                callback(storage.data[key][shr.network]);
-                return;
+                default:
+                    return config.urls[shr.network](encodeURIComponent(shr.url))
             }
         }
 
-        // Format the JSONP endpoint
-        var url = _formatUrl(shr);
+        return null;
+    }
 
-        // Make the request
-        if (!_isNullOrEmpty(url)) {
-            _getJSONP(url, function(data) {
+    // Get the count for the url from API
+    function getCount(shr, callback) {
+        // Format the JSONP endpoint
+        var url = formatUrl(shr);
+
+        // If there's an endpoint
+        if (!isNullOrEmpty(url)) {
+            // Try from cache first
+            if (config.storage.enabled) {
+                var key = parseUrl(shr);
+
+                // Get from storage if it exists
+                if (key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
+                    callback(storage.data[key][shr.network]);
+                    return;
+                }
+            }
+
+            // Make the request
+            getJSONP(url, function(data) {
                 // Cache in local storage (that expires)
                 if (config.storage.enabled) {
                     // Create the initial object, if it's null
@@ -274,7 +287,7 @@
                     storage.data[key][shr.network] = data;
 
                     // Store the result
-                    _setStorage(storage.data);
+                    setStorage(storage.data);
                 }
 
                 callback(data);
@@ -283,31 +296,28 @@
     }
 
     // Get the value for count
-    function _prefixData(network, data) {
+    function prefixData(network, data) {
         if (network in config.count.prefix) {
             return data[config.count.prefix[network]];
-        }
-        else {
+        } else {
             return data;
         }
     }
 
     // Display the count
-    function _displayCount(shr, data) {
-        var count, display,
-            custom = shr.link.getAttribute('data-shr-display');
+    function displayCount(shr, data) {
+        var count, display;
+        var custom = shr.link.getAttribute('data-shr-display');
 
         // Prefix data
         // eg. GitHub uses data.data.forks, vs facebooks data.shares
-        data = _prefixData(shr.network, data);
+        data = prefixData(shr.network, data);
 
-        if (!_isNullOrEmpty(custom)) {
+        if (!isNullOrEmpty(custom)) {
             count = data[custom];
-        }
-        else if (shr.network in config.count.value) {
+        } else if (shr.network in config.count.value) {
             count = data[config.count.value[shr.network]];
-        }
-        else {
+        } else {
             count = data.count;
         }
 
@@ -318,12 +328,10 @@
         // Format
         if (config.count.format && shr.count > 1000000) {
             display = Math.round(shr.count / 1000000) + 'M';
-        }
-        else if (config.count.format && shr.count > 1000) {
+        } else if (config.count.format && shr.count > 1000) {
             display = Math.round(shr.count / 1000) + 'K';
-        }
-        else {
-            display = _formatNumber(shr.count);
+        } else {
+            display = formatNumber(shr.count);
         }
 
         // Only display if there's a count
@@ -337,7 +345,7 @@
         var shr = this;
 
         if (typeof link === 'undefined') {
-            _log('No share link found.', true);
+            log('No share link found.', true);
             return false;
         }
 
@@ -348,14 +356,14 @@
         shr.network = link.getAttribute('data-shr-network');
 
         // Get the url we're sharing
-        shr.url = _parseUrl(shr);
+        shr.url = parseUrl(shr);
 
         // Get the share count
-        _getCount(shr, function(data) { _displayCount(shr, data); });
+        getCount(shr, function(data) { displayCount(shr, data); });
 
         // Listen for events
-        _on(shr.link, 'click', function(event) {
-            _popup(event, shr);
+        on(shr.link, 'click', function(event) {
+            popup(event, shr);
         });
 
         // Return the instance
@@ -374,7 +382,7 @@
             elements = [elements];
         }
         // No selector passed, possibly options as first argument
-        else if (!(elements instanceof NodeList) && typeof elements !== 'string')  {
+        else if (!(elements instanceof NodeList) && typeof elements !== 'string') {
             // If options are the first argument
             if (typeof options === 'undefined' && typeof elements === 'object') {
                 options = elements;
@@ -385,10 +393,10 @@
         }
 
         // Extend the default options with user specified
-        config = _extend(defaults, options);
+        config = extend(defaults, options);
 
         // Get the storage
-        _getStorage();
+        getStorage();
 
         // Create a player instance for each element
         for (var i = elements.length - 1; i >= 0; i--) {
@@ -396,7 +404,7 @@
             var link = elements[i];
 
             // Setup a player instance and add to the element
-            if (typeof link.shr === 'undefined') { 
+            if (typeof link.shr === 'undefined') {
                 // Create new instance
                 var instance = new Shr(link);
 
