@@ -66,9 +66,6 @@
         storage: {
             key: 'shr',
             enabled: (function() {
-                if ('localStorage' in window && window.localStorage !== null) {
-                    return false;
-                }
 
                 // Try to use it (it might be disabled, e.g. user is in private/porn mode)
                 // see: https://github.com/Selz/plyr/issues/131
