@@ -2,35 +2,10 @@
 // Examples
 // ==========================================================================
 .examples {
-	display: inline-block;
-	vertical-align: middle;
-	padding: @padding-base (@padding-base * 1.5);
-	margin-bottom: @padding-base;
-	background: #fff;
-	border-radius: 4px;
-	box-shadow: 0 1px 1px rgba(0,0,0, .1);
-	text-shadow: none;
+    margin-bottom: @padding-base;
+    text-shadow: none;
 
-	.button,
-	.button-addon {
-		display: inline-block;
-		vertical-align: middle;
-		margin-top: (@padding-base / 4);
-		margin-bottom: (@padding-base / 4);
-	}
-	.button-addon .button {
-		margin-top: 0;
-		margin-bottom: 0;
-	}
-	.button svg {
-		margin-right: 7px;
-		vertical-align: -3px;
-		width: 16px;
-		height: 16px;
-		fill: currentColor;
-	}
-
-	@media (min-width: @screen-sm) {
+    @media (min-width: @screen-sm) {
         margin-bottom: (@padding-base * 3);
     }
 }

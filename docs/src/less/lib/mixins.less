@@ -6,9 +6,14 @@
 // ---------------------------------------
 .clearfix() {
     zoom: 1;
-    &:before, 
-    &:after { content: ""; display: table; }
-    &:after { clear: both; }
+    &:before,
+    &:after {
+        content: "";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
 }
 
 // Webkit-style focus
@@ -23,7 +28,7 @@
 // Use rems for font sizing
 // Leave <body> at 100%/16px
 // ---------------------------------------
-.font-size(@font-size: 16){
+.font-size(@font-size: 16) {
     @rem: round((@font-size / 16), 3);
     font-size: (@font-size * 1px);
     font-size: ~"@{rem}rem";
@@ -31,11 +36,29 @@
 
 // Font smoothing
 // ---------------------------------------
-.font-smoothing(@mode: on) when (@mode = on) {
+.font-smoothing(@mode: on) when(@mode = on) {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
 }
-.font-smoothing(@mode: on) when (@mode = off) {
+.font-smoothing(@mode: on) when(@mode = off) {
     -moz-osx-font-smoothing: auto;
     -webkit-font-smoothing: subpixel-antialiased;
+}
+
+// Button styling
+// ---------------------------------------
+.button-styles(@background-color: @shr-button-base-bg-color, @focus-color: fade(@background-color, 50%)) {
+    background-image: linear-gradient(@background-color, darken(@background-color, 4%));
+    background-color: @background-color;
+    border: 1px solid darken(@background-color, 10%);
+    border-bottom-color: darken(@background-color, 15%);
+
+    &:hover,
+    &:focus {
+        border-color: darken(@background-color, 20%);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 3px @focus-color;
+    }
 }

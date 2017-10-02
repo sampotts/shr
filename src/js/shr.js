@@ -20,11 +20,12 @@
         selector: '[data-shr-network]', // Base selector for the share link
         count: {
             classname: 'share-count', // Classname for the share count
-            displayZero: true, // Display zero values
+            displayZero: false, // Display zero values
             format: true, // Display 1000 as 1K, 1000000 as 1M, etc
             position: 'after', // Inject the count before or after the link in the DOM
-            html: function(count, classname) {
-                return '<span class="' + classname + '">' + count + '</span>';
+            increment: true, // Increment the count on click?
+            html: function(count, classname, position) {
+                return '<span class="' + classname + ' ' + classname + '--' + position + '">' + count + '</span>';
             },
             value: {
                 facebook: 'shares',
@@ -296,7 +297,7 @@
 
                 // Get from storage if it exists
                 if (key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
-                    callback(storage.data[key][shr.network]);
+                    callback.call(null, storage.data[key][shr.network]);
                     return;
                 }
             }
@@ -319,7 +320,7 @@
                     setStorage(storage.data);
                 }
 
-                callback(data);
+                callback.call(null, data);
             });
         }
     }
@@ -333,15 +334,20 @@
         }
     }
 
-    // Display the count
-    function displayCount(shr, data) {
-        var count;
-        var display;
-        var custom = shr.link.getAttribute('data-shr-display');
+    // Custom parseInt
+    function parseInt(value) {
+        value = Number(value);
+        return !isNaN(value) ? value : 0;
+    }
 
+    // Display the count
+    function displayCount(shr, data, increment) {
         // Prefix data
         // eg. GitHub uses data.data.forks, vs facebooks data.shares
         data = prefixData(shr.network, data);
+
+        var count;
+        var custom = shr.link.getAttribute('data-shr-display');
 
         if (!isNullOrEmpty(custom)) {
             count = data[custom];
@@ -351,25 +357,50 @@
             count = data.count;
         }
 
-        // Store count
-        shr.count = typeof count === 'number' ? count : 0;
-        display = shr.count;
+        // Parse
+        count = parseInt(count);
 
-        // Format
-        if (config.count.format && shr.count > 1000000) {
-            display = Math.round(shr.count / 1000000) + 'M';
-        } else if (config.count.format && shr.count > 1000) {
-            display = Math.round(shr.count / 1000) + 'K';
-        } else {
-            display = formatNumber(shr.count);
+        // Store count
+        shr.count = count;
+
+        // If we're incrementing (e.g. on click)
+        if (increment) {
+            // Increment the current value if we have it
+            if (shr.display) {
+                count = parseInt(shr.display.innerText);
+            }
+            count++;
         }
 
         // Only display if there's a count
-        if (shr.count > 0 || config.count.displayZero) {
-            shr.link.insertAdjacentHTML(
-                config.count.position === 'after' ? 'afterend' : 'beforebegin',
-                config.count.html(display, config.count.classname)
-            );
+        if (count > 0 || config.count.displayZero) {
+            // Standardize position
+            config.count.position = config.count.position.toLowerCase();
+            var isAfter = config.count.position === 'after';
+
+            // Format
+            var label;
+            if (config.count.format && shr.count > 1000000) {
+                label = Math.round(count / 1000000) + 'M';
+            } else if (config.count.format && shr.count > 1000) {
+                label = Math.round(count / 1000) + 'K';
+            } else {
+                label = formatNumber(count);
+            }
+
+            // Update or insert
+            if (shr.display) {
+                shr.display.textContent = label;
+            } else {
+                // Insert count display
+                shr.link.insertAdjacentHTML(
+                    isAfter ? 'afterend' : 'beforebegin',
+                    config.count.html(label, config.count.classname, config.count.position)
+                );
+
+                // Store reference
+                shr.display = shr.link[isAfter ? 'nextSibling' : 'previousSibling'];
+            }
         }
     }
 
@@ -399,6 +430,15 @@
         // Listen for events
         on(shr.link, 'click', function(event) {
             popup(event, shr);
+
+            // Refresh the share count
+            getCount(
+                shr,
+                function(data) {
+                    displayCount(shr, data, true);
+                },
+                config.count.increment
+            );
         });
 
         // Return the instance

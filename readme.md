@@ -33,8 +33,8 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.shr.one/1.0.5/shr.css">
-<script src="https://cdn.shr.one/1.0.5/shr.js"></script>
+<link rel="stylesheet" href="https://cdn.shr.one/1.1.0/shr.css">
+<script src="https://cdn.shr.one/1.1.0/shr.js"></script>
 ```
 
 ### CSS
@@ -45,7 +45,7 @@ If you want to use the default css, add the `shr.css` file from /dist into your 
 ```
 
 ### HTML
-TBC
+TBC. Shr uses progresive enhancement to add functionality to existing HTML. This means the links will still function with JavaScript disabled. For now please see the demo for example HTML.
 
 ### JavaScript
 Much of the behaviour of the player is configurable when initialising the library. Here's an example of a default setup:
@@ -56,7 +56,6 @@ Much of the behaviour of the player is configurable when initialising the librar
 ```
 
 #### Options
-
 TBC
 
 ## Browser support
