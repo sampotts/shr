@@ -42,7 +42,9 @@
                 return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
             },
             github: function(repo, token) {
-                return 'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '');
+                return (
+                    'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
+                );
             }
         },
         popup: {
@@ -66,11 +68,7 @@
         storage: {
             key: 'shr',
             enabled: (function() {
-                if ('localStorage' in window && window.localStorage !== null) {
-                    return false;
-                }
-
-                // Try to use it (it might be disabled, e.g. user is in private/porn mode)
+                // Try to use local storage (it might be disabled, e.g. user is in private/porn mode)
                 // see: https://github.com/Selz/plyr/issues/131
                 try {
                     // Add test item
@@ -83,7 +81,7 @@
                     window.localStorage.removeItem('___test');
 
                     // Check if value matches
-                    return (result === 'OK');
+                    return result === 'OK';
                 } catch (e) {
                     return false;
                 }
@@ -101,18 +99,20 @@
 
     // Is null or empty
     function isNullOrEmpty(string) {
-        return (typeof string === 'undefined' || string === null || !string.length);
+        return typeof string === 'undefined' || string === null || !string.length;
     }
 
     // Format a number nicely (even in IE)
     // http://stackoverflow.com/a/26506856/1191319
     function formatNumber(number) {
         // Work out whether decimal separator is . or , for localised numbers
-        var decimalSeparator = (/\./.test((1.1).toLocaleString()) ? '.' : ',');
+        var decimalSeparator = /\./.test((1.1).toLocaleString()) ? '.' : ',';
 
         // Round n to an integer and present
         var re = new RegExp('\\' + decimalSeparator + '\\d+$');
-        return Math.round(number).toLocaleString().replace(re, '');
+        return Math.round(number)
+            .toLocaleString()
+            .replace(re, '');
     }
 
     // Toggle event
@@ -179,15 +179,19 @@
             window[name].focus();
         } else {
             // Get position
-            var left = (window.screenLeft !== undefined ? window.screenLeft : screen.left);
-            var top = (window.screenTop !== undefined ? window.screenTop : screen.top);
+            var left = window.screenLeft !== undefined ? window.screenLeft : screen.left;
+            var top = window.screenTop !== undefined ? window.screenTop : screen.top;
 
             // Open in the centre of the screen
-            var x = (screen.width / 2) - (width / 2) + left;
-            var y = (screen.height / 2) - (height / 2) + top;
+            var x = screen.width / 2 - width / 2 + left;
+            var y = screen.height / 2 - height / 2 + top;
 
             // Open that window
-            window[name] = window.open(url, shr.network, 'top=' + y + ',left=' + x + ',width=' + width + ',height=' + height);
+            window[name] = window.open(
+                url,
+                shr.network,
+                'top=' + y + ',left=' + x + ',width=' + width + ',height=' + height
+            );
 
             // Focus new window
             window[name].focus();
@@ -247,7 +251,7 @@
 
         // Store the result and set a TTL
         window.localStorage[config.storage.key] = JSON.stringify(data);
-        window.localStorage[config.storage.key + '_ttl'] = (Date.now() + config.storage.ttl);
+        window.localStorage[config.storage.key + '_ttl'] = Date.now() + config.storage.ttl;
     }
 
     // Parse share url from button href
@@ -274,7 +278,7 @@
                     return config.urls[shr.network](parseUrl(shr), config.tokens.github);
 
                 default:
-                    return config.urls[shr.network](encodeURIComponent(shr.url))
+                    return config.urls[shr.network](encodeURIComponent(shr.url));
             }
         }
 
@@ -350,7 +354,7 @@
         }
 
         // Store count
-        shr.count = (typeof count === 'number' ? count : 0);
+        shr.count = typeof count === 'number' ? count : 0;
         display = shr.count;
 
         // Format
@@ -364,7 +368,10 @@
 
         // Only display if there's a count
         if (shr.count > 0 || config.count.displayZero) {
-            shr.link.insertAdjacentHTML((config.count.position === 'after' ? 'afterend' : 'beforebegin'), config.count.html(display, config.count.classname));
+            shr.link.insertAdjacentHTML(
+                config.count.position === 'after' ? 'afterend' : 'beforebegin',
+                config.count.html(display, config.count.classname)
+            );
         }
     }
 
@@ -406,13 +413,11 @@
         // Assume elements is a NodeList by default
         if (typeof elements === 'string') {
             elements = document.querySelectorAll(elements);
-        }
-        // Single HTMLElement passed
-        else if (elements instanceof HTMLElement) {
+        } else if (elements instanceof HTMLElement) {
+            // Single HTMLElement passed
             elements = [elements];
-        }
-        // No selector passed, possibly options as first argument
-        else if (!(elements instanceof NodeList) && typeof elements !== 'string') {
+        } else if (!(elements instanceof NodeList)) {
+            // No selector passed, possibly options as first argument
             // If options are the first argument
             if (typeof options === 'undefined' && typeof elements === 'object') {
                 options = elements;
@@ -439,7 +444,7 @@
                 var instance = new Shr(link);
 
                 // Set plyr to false if setup failed
-                link.shr = (Object.keys(instance).length ? instance : false);
+                link.shr = Object.keys(instance).length ? instance : false;
             }
         }
 
@@ -448,5 +453,5 @@
             log = window.console.log.bind(console);
             error = window.console.error.bind(console);
         }
-    }
-}(this.shr = this.shr || {}));
+    };
+})((window.shr = window.shr || {}));
