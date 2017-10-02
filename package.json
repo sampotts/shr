@@ -1,6 +1,6 @@
 {
     "name": "shr",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Simple, customizable sharing buttons",
     "homepage": "http://shr.one",
     "main": "gulpfile.js",
@@ -27,20 +27,11 @@
     "scripts": {
         "preinstall": "npm install -g gulp"
     },
-    "keywords": [
-        "Facebook",
-        "Twitter",
-        "Pinterest",
-        "Google Plus",
-        "Sharing",
-        "Share buttons"
-    ],
+    "keywords": ["Facebook", "Twitter", "Pinterest", "Google Plus", "Sharing", "Share buttons"],
     "repository": {
         "type": "git",
         "url": "git://github.com/sampotts/shr.git"
     },
-    "authors": [
-        "Sam Potts <sam@potts.es>"
-    ],
+    "authors": ["Sam Potts <sam@potts.es>"],
     "license": "MIT"
 }

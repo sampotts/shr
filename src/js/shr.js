@@ -21,7 +21,7 @@
         count: {
             classname: 'share-count', // Classname for the share count
             displayZero: true, // Display zero values
-            format: false, // Display 1000 as 1K, 1000000 as 1M, etc
+            format: true, // Display 1000 as 1K, 1000000 as 1M, etc
             position: 'after', // Inject the count before or after the link in the DOM
             html: function(count, classname) {
                 return '<span class="' + classname + '">' + count + '</span>';
@@ -85,8 +85,6 @@
                 } catch (e) {
                     return false;
                 }
-
-                return false;
             })(),
             ttl: 300000 // 5 minutes in milliseconds
         },

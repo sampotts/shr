@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.5
+- Fix for local storage - thanks @danfoley
+- Default to formatted numbers - e.g. 1K rather than 1000
+
+## v1.0.4
+- Small bug fix
+
+## v1.0.3
+- Small bug fix
+
 ## v1.0.2
 - Security fix
 
