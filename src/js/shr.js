@@ -27,7 +27,7 @@
                 return '<span class="' + classname + '">' + count + '</span>';
             },
             value: {
-                facebook: 'shares',
+                facebook: 'share_count',
                 github: 'stargazers_count'
             },
             prefix: {
