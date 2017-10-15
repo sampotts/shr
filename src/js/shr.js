@@ -492,4 +492,4 @@
             error = window.console.error.bind(console);
         }
     };
-})((window.shr = window.shr || {}));
+})(window.shr = window.shr || {});
