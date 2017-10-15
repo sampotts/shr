@@ -12,7 +12,7 @@
     var config;
     var storage = {
         data: {},
-        ttl: 0
+        ttl: 0,
     };
 
     // Default config
@@ -28,12 +28,12 @@
                 return '<span class="' + classname + ' ' + classname + '--' + position + '">' + count + '</span>';
             },
             value: {
-                facebook: 'shares',
-                github: 'stargazers_count'
+                facebook: 'share_count',
+                github: 'stargazers_count',
             },
             prefix: {
-                github: 'data'
-            }
+                github: 'data',
+            },
         },
         urls: {
             facebook: function(url) {
@@ -46,50 +46,42 @@
                 return (
                     'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
                 );
-            }
+            },
         },
         popup: {
             google: {
                 width: 500,
-                height: 500
+                height: 500,
             },
             facebook: {
                 width: 640,
-                height: 270
+                height: 270,
             },
             twitter: {
                 width: 640,
-                height: 240
+                height: 240,
             },
             pinterest: {
                 width: 750,
-                height: 550
-            }
+                height: 550,
+            },
         },
         storage: {
             key: 'shr',
             enabled: (function() {
-                // Try to use local storage (it might be disabled, e.g. user is in private/porn mode)
-                // see: https://github.com/Selz/plyr/issues/131
+                // Try to use local storage (it might be disabled, e.g. user is in private mode)
                 try {
-                    // Add test item
-                    window.localStorage.setItem('___test', 'OK');
-
-                    // Get the test item
-                    var result = window.localStorage.getItem('___test');
-
-                    // Clean up
-                    window.localStorage.removeItem('___test');
-
-                    // Check if value matches
-                    return result === 'OK';
+                    var key = '___test';
+                    window.localStorage.setItem(key, key);
+                    window.localStorage.removeItem(key);
+                    return true;
                 } catch (e) {
                     return false;
                 }
             })(),
-            ttl: 300000 // 5 minutes in milliseconds
+            ttl: 300000, // 5 minutes in milliseconds
         },
-        tokens: {}
+        tokens: {},
     };
 
     // Debugging
@@ -203,7 +195,7 @@
 
     // Get URL parameter by name
     function getParameterByName(query, name) {
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
 
         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
         var results = regex.exec(query);
@@ -237,7 +229,7 @@
         if (config.storage.enabled && config.storage.key in window.localStorage) {
             storage = {
                 data: JSON.parse(window.localStorage[config.storage.key]),
-                ttl: window.localStorage[config.storage.key + '_ttl']
+                ttl: window.localStorage[config.storage.key + '_ttl'],
             };
         }
     }
@@ -346,9 +338,17 @@
         // eg. GitHub uses data.data.forks, vs facebooks data.shares
         data = prefixData(shr.network, data);
 
-        var count;
+        var count = 0;
         var custom = shr.link.getAttribute('data-shr-display');
 
+        // Facebook changed the schema of their data
+        switch (shr.network) {
+            case 'facebook':
+                data = data.share;
+                break;
+        }
+
+        // Get value based on config
         if (!isNullOrEmpty(custom)) {
             count = data[custom];
         } else if (shr.network in config.count.value) {
