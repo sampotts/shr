@@ -3,7 +3,7 @@
 // ==========================================================================
 
 // Shared
-.button,
+.shr-button,
 .share-count {
     vertical-align: middle;
     border-radius: @shr-button-border-radius;
@@ -13,18 +13,18 @@
     .font-smoothing(@shr-font-smoothing);
 }
 
-.button + .button,
-.share-count--after + .button,
-.button + .share-count--before {
+.shr-button + .shr-button,
+.share-count--after + .shr-button,
+.shr-button + .share-count--before {
     margin-left: ceil(@shr-padding-base / 4);
 }
 
 // Buttons
-.button {
+.shr-button {
     display: inline-flex;
     align-items: center;
     padding: ceil(@shr-padding-base / 4) ceil(@shr-padding-base / 2);
-    .button-styles();
+    .shr-button-styles();
     transition: all 0.3s ease;
     color: @shr-button-text-color;
     text-decoration: none;
@@ -46,19 +46,19 @@
 
     // Network specific styles
     &-facebook {
-        .button-styles(@shr-button-facebook-bg-color);
+        .shr-button-styles(@shr-button-facebook-bg-color);
     }
     &-twitter {
-        .button-styles(@shr-button-twitter-bg-color);
+        .shr-button-styles(@shr-button-twitter-bg-color);
     }
     &-pinterest {
-        .button-styles(@shr-button-pinterest-bg-color);
+        .shr-button-styles(@shr-button-pinterest-bg-color);
     }
     &-google {
-        .button-styles(@shr-button-google-bg-color);
+        .shr-button-styles(@shr-button-google-bg-color);
     }
     &-github {
-        .button-styles(@shr-button-github-bg-color, darken(@shr-button-github-bg-color, 10%));
+        .shr-button-styles(@shr-button-github-bg-color, darken(@shr-button-github-bg-color, 10%));
     }
 }
 
