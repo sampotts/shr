@@ -1,0 +1,43 @@
+// ==========================================================================
+// Mixins
+// ==========================================================================
+
+// Button styling
+// ---------------------------------------
+@mixin shr-button-styles($background-color: $shr-button-base-bg-color, $focus-color: fade($background-color, 50%)){
+    background-color: $background-color;
+    border: $shr-button-border-width solid darken($background-color, 10%);
+    border-bottom-color: darken($background-color, 15%);
+    @include contrast-text-color($background-color);
+
+    &:hover,
+    &:focus {
+        border-color: darken($background-color, 15%);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 3px $focus-color;
+    }
+}
+
+// Contrast helpers
+// ---------------------------------------
+@mixin contrast-text-color($background: ""){
+  @if( lightness($background) >= 65% ){
+    color: #333;
+  } @else {
+    color: #fff;
+  }
+}
+
+// Font smoothing
+// ---------------------------------------
+@mixin font-smoothing($mode: $shr-font-smoothing){
+  @if( $mode = on ){
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+  } @else {
+    -moz-osx-font-smoothing: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}

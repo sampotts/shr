@@ -175,6 +175,7 @@ gulp.task('watch', function() {
     // Core
     gulp.watch(paths.shr.src.js, tasks.js);
     gulp.watch(paths.shr.src.less, tasks.less);
+    gulp.watch(paths.shr.src.sass, tasks.sass);
     gulp.watch(paths.shr.src.sprite, ['sprite']);
 
     // Docs
@@ -184,94 +185,94 @@ gulp.task('watch', function() {
 
 // Default gulp task
 gulp.task('default', function() {
-    run(tasks.js, tasks.less, 'sprite', 'watch');
+    run(tasks.js, tasks.less, tasks.sass, 'sprite', 'watch');
 });
 
 // Publish a version to CDN and docs
 // --------------------------------------------
 
 //Some options
-var aws = loadJSON(path.join(root, 'aws.json'));
-var version = package.version;
-var maxAge = 31536000; // seconds 1 year
-var options = {
-    cdn: {
-        headers: {
-            'Cache-Control': 'max-age=' + maxAge,
-            Vary: 'Accept-Encoding',
-        },
-        gzippedOnly: true,
-    },
-    docs: {
-        headers: {
-            'Cache-Control': 'public, must-revalidate, proxy-revalidate, max-age=0',
-            Vary: 'Accept-Encoding',
-        },
-        gzippedOnly: true,
-    },
-};
-
-// If aws is setup
-if ('cdn' in aws) {
-    var regex = '(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)';
-    var cdnpath = new RegExp(aws.cdn.domain + '/' + regex, 'gi');
-    var semver = new RegExp('shr v' + regex, 'gi');
-    var localpath = new RegExp('(../)?dist', 'gi');
-}
-
-// Publish version to CDN bucket
-gulp.task('cdn', function() {
-    console.log('Uploading ' + version + ' to ' + aws.cdn.bucket);
-
-    // Upload to CDN
-    gulp
-        .src(paths.upload)
-        .pipe(
-            size({
-                showFiles: true,
-                gzip: true,
-            })
-        )
-        .pipe(
-            rename(function(path) {
-                path.dirname = path.dirname.replace('.', version);
-            })
-        )
-        .pipe(gzip())
-        .pipe(s3(aws.cdn, options.cdn));
-});
+// var aws = loadJSON(path.join(root, 'aws.json'));
+// var version = package.version;
+// var maxAge = 31536000; // seconds 1 year
+// var options = {
+//     cdn: {
+//         headers: {
+//             'Cache-Control': 'max-age=' + maxAge,
+//             Vary: 'Accept-Encoding',
+//         },
+//         gzippedOnly: true,
+//     },
+//     docs: {
+//         headers: {
+//             'Cache-Control': 'public, must-revalidate, proxy-revalidate, max-age=0',
+//             Vary: 'Accept-Encoding',
+//         },
+//         gzippedOnly: true,
+//     },
+// };
+//
+// // If aws is setup
+// if ('cdn' in aws) {
+//     var regex = '(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)';
+//     var cdnpath = new RegExp(aws.cdn.domain + '/' + regex, 'gi');
+//     var semver = new RegExp('shr v' + regex, 'gi');
+//     var localpath = new RegExp('(../)?dist', 'gi');
+// }
+//
+// // Publish version to CDN bucket
+// gulp.task('cdn', function() {
+//     console.log('Uploading ' + version + ' to ' + aws.cdn.bucket);
+//
+//     // Upload to CDN
+//     gulp
+//         .src(paths.upload)
+//         .pipe(
+//             size({
+//                 showFiles: true,
+//                 gzip: true,
+//             })
+//         )
+//         .pipe(
+//             rename(function(path) {
+//                 path.dirname = path.dirname.replace('.', version);
+//             })
+//         )
+//         .pipe(gzip())
+//         .pipe(s3(aws.cdn, options.cdn));
+// });
 
 // Publish to Docs bucket
-gulp.task('docs', function() {
-    console.log('Uploading ' + version + ' docs to ' + aws.docs.bucket);
-
-    // Replace versioned files in readme.md
-    gulp
-        .src([root + '/readme.md'])
-        .pipe(replace(cdnpath, aws.cdn.domain + '/' + version))
-        .pipe(gulp.dest(root));
-
-    // Replace versioned files in *.html
-    // e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
-    gulp
-        .src([paths.docs.root + '*.html'])
-        .pipe(replace(localpath, 'https://' + aws.cdn.domain + '/' + version))
-        .pipe(gzip())
-        .pipe(s3(aws.docs, options.docs));
-
-    // Replace versioned files in shr.js
-    gulp
-        .src(path.join(root, 'src/js/shr.js'))
-        .pipe(replace(semver, 'v' + version))
-        .pipe(gulp.dest(path.join(root, 'src/js/')));
-
-    // Upload error.html to cdn using docs options
-    gulp
-        .src([paths.docs.root + 'error.html'])
-        .pipe(replace(localpath, 'https://' + aws.cdn.domain + '/' + version))
-        .pipe(gzip())
-        .pipe(s3(aws.cdn, options.docs));
-});
+// gulp.task('docs', function() {
+//     console.log('Uploading ' + version + ' docs to ' + aws.docs.bucket);
+//
+//     // Replace versioned files in readme.md
+//     gulp
+//         .src([root + '/readme.md'])
+//         .pipe(replace(cdnpath, aws.cdn.domain + '/' + version))
+//         .pipe(gulp.dest(root));
+//
+//     // Replace versioned files in *.html
+//     // e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
+//     gulp
+//         .src([paths.docs.root + '*.html'])
+//         .pipe(replace(localpath, 'https://' + aws.cdn.domain + '/' + version))
+//         .pipe(gzip())
+//         .pipe(s3(aws.docs, options.docs));
+//
+//     // Replace versioned files in shr.js
+//     gulp
+//         .src(path.join(root, 'src/js/shr.js'))
+//         .pipe(replace(semver, 'v' + version))
+//         .pipe(gulp.dest(path.join(root, 'src/js/')));
+//
+//     // Upload error.html to cdn using docs options
+//     gulp
+//         .src([paths.docs.root + 'error.html'])
+//         .pipe(replace(localpath, 'https://' + aws.cdn.domain + '/' + version))
+//         .pipe(gzip())
+//         .pipe(s3(aws.cdn, options.docs));
+// });
 
 // Open the docs site to check it's sweet
 gulp.task('open', function() {
@@ -289,5 +290,5 @@ gulp.task('open', function() {
 
 // Do everything
 gulp.task('publish', function() {
-    run(tasks.js, tasks.less, 'sprite', 'cdn', 'docs');
+    run(tasks.js, tasks.less, tasks.sass, 'sprite', 'cdn', 'docs');
 });
