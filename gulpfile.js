@@ -190,7 +190,7 @@ gulp.task('default', function() {
 // Publish a version to CDN and docs
 // --------------------------------------------
 
-// Some options
+//Some options
 var aws = loadJSON(path.join(root, 'aws.json'));
 var version = package.version;
 var maxAge = 31536000; // seconds 1 year
