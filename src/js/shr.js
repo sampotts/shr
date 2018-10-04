@@ -31,6 +31,74 @@
     };
 
     /**
+     * Settings. These are uneditable by the user.
+     */
+     var settings = {
+       facebook: {
+         url: function( url ) {
+             return 'https://graph.facebook.com/?id=' + url;
+         },
+         shareCount: function( data ){
+           return data.share.share_count;
+         }
+       },
+
+       twitter: {
+         url: function( url ){
+            return null;
+         },
+         shareCount: function( data ){
+           return null;
+         }
+       },
+
+       google: {
+         url: function( url ){
+            return null;
+         },
+         shareCount: function( data ){
+           return null;
+         }
+       },
+
+       pinterest: {
+         url: function( url ) {
+            return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
+         },
+         shareCount: function( data ){
+            return data.count;
+         }
+       },
+
+       github: {
+         url: function( repo, token ) {
+           return (
+               'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
+           );
+         },
+         shareCount: function( data ){
+           return data.data.stargazers_count;
+         }
+       },
+
+       storage: {
+         enabled: (function() {
+             /*
+               Try to use local storage (it might be disabled, e.g. user is in private mode)
+             */
+             try {
+                 var key = '___test';
+                 window.localStorage.setItem(key, key);
+                 window.localStorage.removeItem(key);
+                 return true;
+             } catch (e) {
+                 return false;
+             }
+         })(),
+       }
+     };
+
+    /**
      * Default Shr Config. All variables, settings and states are stored here
      * and global.
      *
@@ -79,7 +147,7 @@
      * @property {Object}   tokens                - The object containing the API tokens for the sharing networks.
      */
     var defaults = {
-        selector: '[data-shr-network]',
+        selector: 'data-shr-network',
         count: {
             classname: 'share-count',
             displayZero: false,
@@ -88,62 +156,38 @@
             increment: true,
             html: function( count, classname, position) {
                 return '<span class="' + classname + ' ' + classname + '--' + position + '">' + count + '</span>';
-            },
-            value: {
-                facebook: 'share_count',
-                github: 'stargazers_count',
-            },
-            prefix: {
-                github: 'data',
-            },
+            }
         },
-        urls: {
-            facebook: function( url ) {
-                return 'https://graph.facebook.com/?id=' + url;
-            },
-            pinterest: function( url ) {
-                return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
-            },
-            github: function( repo, token ) {
-                return (
-                    'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
-                );
-            },
+        google: {
+          popup: {
+            width: 500,
+            height: 500
+          }
         },
-        popup: {
-            google: {
-                width: 500,
-                height: 500,
-            },
-            facebook: {
-                width: 640,
-                height: 270,
-            },
-            twitter: {
-                width: 640,
-                height: 240,
-            },
-            pinterest: {
-                width: 750,
-                height: 550,
-            },
+        facebook: {
+          popup: {
+            width: 640,
+            height: 270,
+          }
+        },
+        twitter: {
+          popup: {
+            width: 640,
+            height: 240
+          }
+        },
+        pinterest: {
+          popup: {
+            width: 750,
+            height: 550
+          }
+        },
+        github: {
+          tokens: {}
         },
         storage: {
-            key: 'shr',
-            enabled: (function() {
-                /*
-                  Try to use local storage (it might be disabled, e.g. user is in private mode)
-                */
-                try {
-                    var key = '___test';
-                    window.localStorage.setItem(key, key);
-                    window.localStorage.removeItem(key);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            })(),
-            ttl: 300000,
+          key: 'shr',
+          ttl: 300000,
         },
         tokens: {},
     };
@@ -278,7 +322,7 @@
         /*
           Only popup if we need to...
         */
-        if (!(shr.network in config.popup)) {
+        if (! config[shr.network].popup ) {
             return;
         }
 
@@ -290,7 +334,7 @@
         /*
           Set variables for the popup
         */
-        var size = config.popup[shr.network];
+        var size = config[shr.network].popup;
         var url = shr.link.href;
         var width = size.width;
         var height = size.height;
@@ -339,7 +383,7 @@
     /**
      * Get URL parameter by name
      *
-     * @param {string} query  - The query link for the share count.
+     * @param {string} query  - The query part of the URL.
      * @param {string} name   - The name of the social network we are getting the share count for.
      */
     function getParameterByName( query, name ) {
@@ -424,40 +468,60 @@
     }
 
     /**
-     * Parse share url from button href
+     * Parse share url from button href. This returns the URL we are geting the
+     * share count for.
+     *
      * https://gist.github.com/jlong/2428561
      *
      * @param {Object} shr  - The Shr object.
      */
     function parseUrl( shr ) {
         /*
-          Get the url based on the network
+          Get the url that is being shared based on the network
         */
-        switch (shr.network) {
+        switch ( shr.network ) {
             case 'facebook':
-                return getParameterByName(shr.link.search, 'u');
-
+                return getParameterByName( shr.link.search, 'u' );
+            break;
             case 'github':
                 return shr.link.pathname;
-
+            break;
+            case 'twitter':
+                return getParameterByName( shr.link.search, 'url' );
+            break;
+            case 'pinterest':
+                return getParameterByName( shr.link.search, 'url' );
+            break;
+            case 'google':
+                return getParameterByName( shr.link.search, 'url' );
+            break;
             default:
-                return getParameterByName(shr.link.search, 'url');
+                return getParameterByName( shr.link.search, 'url' );
+            break;
         }
     }
 
     /**
      * String format an endpoint URL for JSONP
-     *
      * @param {Object} shr  - The Shr object.
      */
     function formatUrl( shr ) {
-        if ( shr.network in config.urls)  {
-            switch ( shr.network ) {
-                case 'github':
-                    return config.urls[shr.network](parseUrl(shr), config.tokens.github);
-
-                default:
-                    return config.urls[shr.network](encodeURIComponent(shr.url));
+        if ( shr.network in config )  {
+            /*
+              Build the URL for the JSON P based off of network.
+            */
+            switch( shr.network ){
+              /*
+                GitHub requires a repo for the API call, so we need to build
+                the URL. We will also need tokens if they were passed in to build
+                the URL.
+              */
+              case 'github':
+                return config[ shr.network ]['url']( shr.url, config.github.tokens );
+              break;
+              default:
+                return config[ shr.network ]['url']( encodeURIComponent( shr.url ) );
+              break;
             }
         }
 
@@ -481,29 +545,44 @@
         var url = formatUrl( shr );
 
         /*
-          If there's an endpoint
+          If there's an endpoint. For some social networks, you can't
+          get the share count (like Twitter) so we won't have any data. The link
+          will be to share it, but you won't get a count of how many people have.
         */
         if ( !isNullOrEmpty( url ) ) {
             /*
               Try from cache first
             */
             if ( config.storage.enabled ) {
-                var key = parseUrl(shr);
+                var key = parseUrl( shr );
 
                 /*
-                  Get from storage if it exists
+                  Get from storage if it exists, the network is in the key
+                  based off of the URL and the ttl is still valid.
                 */
-                if (key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
-                    callback.call(null, storage.data[key][shr.network]);
+                if ( key in storage.data
+                      && shr.network in storage.data[key]
+                      && storage.ttl > Date.now() ) {
+
+                    /*
+                      This will display the count.
+                    */
+                    callback.call( null, storage.data[key][ shr.network ] );
+
                     return;
                 }
             }
         }
 
         /*
-          Make the request
+          When we get here, this means the cached counts are not valid,
+          or don't exist. We will call the API if the URL is available
+          at this point.
         */
         if ( !isNullOrEmpty( url ) ) {
+            /*
+              Runs a GET JSON P request on the URL.
+            */
             getJSONP( url, function( data ) {
                 /*
                   Cache in local storage (that expires)
@@ -512,7 +591,7 @@
                     /*
                       Create the initial object, if it's null
                     */
-                    if (!(key in storage.data)) {
+                    if ( !( key in storage.data ) ) {
                         storage.data[key] = {};
                     }
 
@@ -527,22 +606,11 @@
                     setStorage( storage.data );
                 }
 
+                /*
+                  Calls the callback to display the data count.
+                */
                 callback.call( null, data );
             });
-        }
-    }
-
-    /**
-     * Get the value for count
-     *
-     * @param {string} network  - The name of the network we are getting the count for.
-     * @param {Object} data     - The data returned from the API
-     */
-    function prefixData( network, data ) {
-        if ( network in config.count.prefix ) {
-            return data[config.count.prefix[network]];
-        } else {
-            return data;
         }
     }
 
@@ -564,54 +632,37 @@
      * @param {boolean} increment   - Determines if we should increment the count or not.
      */
     function displayCount( shr, data, increment ) {
-        /*
-          Prefix data
-          eg. GitHub uses data.data.forks, vs facebooks data.shares
-        */
-        data = prefixData(shr.network, data);
-
         var count = 0;
         var custom = shr.link.getAttribute('data-shr-display');
-
-        /*
-          Facebook changed the schema of their data
-        */
-        switch (shr.network) {
-            case 'facebook':
-                data = data.share;
-                break;
-        }
 
         /*
           Get value based on config
         */
         if ( !isNullOrEmpty( custom ) ) {
             count = data[custom];
-        } else if (shr.network in config.count.value) {
-            count = data[config.count.value[shr.network]];
-        } else {
-            count = data.count;
+        } else if ( shr.network in config ) {
+            count = config[ shr.network ].shareCount( data );
         }
 
         /*
           Parse
         */
-        count = parseInt(count);
+        count = parseInt( count );
 
         /*
-          Store count
+          Store count in the Shr object.
         */
         shr.count = count;
 
         /*
           If we're incrementing (e.g. on click)
         */
-        if (increment) {
+        if ( increment ) {
             /*
               Increment the current value if we have it
             */
-            if (shr.display) {
-                count = parseInt(shr.display.innerText);
+            if ( shr.display ) {
+                count = parseInt( shr.display.innerText );
             }
             count++;
         }
@@ -681,7 +732,7 @@
         /*
           Get the type (this is super important)
         */
-        shr.network = link.getAttribute('data-shr-network');
+        shr.network = link.getAttribute( config.selector );
 
         /*
           Get the url we're sharing
@@ -691,7 +742,7 @@
         /*
           Get the share count
         */
-        getCount( shr, function(data) {
+        getCount( shr, function( data ) {
             displayCount( shr, data );
         });
 
@@ -707,9 +758,8 @@
             getCount(
                 shr,
                 function(data) {
-                    displayCount(shr, data, true);
-                },
-                config.count.increment
+                  displayCount( shr, data, config.count.increment );
+                }
             );
         });
 
@@ -722,48 +772,34 @@
     /**
      * Expose setup function.
      *
-     * @param {NodeList} elements   - The list of Shr elements.
      * @param {Object} options      - The user defined options to extend to the defaults
      */
-    api.setup = function( elements, options ) {
-        /**
-         * Select the elements
-         * Assume elements is a NodeList by default
-         */
-        if (typeof elements === 'string') {
-            elements = document.querySelectorAll(elements);
-        } else if (elements instanceof HTMLElement) {
-            /*
-              Single HTMLElement passed
-            */
-            elements = [elements];
-        } else if (!(elements instanceof NodeList)) {
-            /*
-              No selector passed, possibly options as first argument
-              If options are the first argument
-            */
-            if (typeof options === 'undefined' && typeof elements === 'object') {
-                options = elements;
-            }
-
-            /*
-              Use default selector
-            */
-            elements = document.querySelectorAll(defaults.selector);
-        }
-
+    api.setup = function( options ) {
         /*
-          Extend the default options with user specified
+          Extend the config with the options with user specified
         */
         config = extend( defaults, options );
 
         /*
-          Get the storage
+          Include the settings into the config so the user doesn't
+          accidentally overwrite important settings.
+        */
+        config = extend( config, settings );
+
+        /*
+          Selects all of the elements based on the config and the selector
+          specified.
+        */
+        var elements = document.querySelectorAll( '['+config.selector+']' );
+
+        /*
+          Gets the storage data from what was already set. This will
+          set the global storage parameter.
         */
         getStorage();
 
         /*
-          Create a link instance for each element
+          Create an Shr link instance for each element
         */
         for (var i = elements.length - 1; i >= 0; i--) {
             /*
@@ -778,12 +814,12 @@
                 /*
                   Create new instance
                 */
-                var instance = new Shr(link);
+                var instance = new Shr( link );
 
                 /*
                   Set link to false if setup failed
                 */
-                link.shr = Object.keys(instance).length ? instance : false;
+                link.shr = Object.keys( instance ).length ? instance : false;
             }
         }
 
@@ -791,8 +827,8 @@
           Debugging
         */
         if ( config.debug && window.console ) {
-            log = window.console.log.bind(console);
-            error = window.console.error.bind(console);
+            log = window.console.log.bind( console );
+            error = window.console.error.bind( console );
         }
     };
 })(window.shr = window.shr || {});
