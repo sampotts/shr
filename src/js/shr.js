@@ -31,7 +31,35 @@
     };
 
     /**
-     * Settings. These are uneditable by the user.
+     * Settings. These are uneditable by the user. These will get merged into
+     * the global config after the user defaults so the user can't overwrite these
+     * values.
+     *
+     * @typedef {Object} settings
+     * @type {Object}
+     *
+     * @property {Object} facebook                 - The settings for Facebook within Shr.
+     * @property {function} facebook.url          - The method that returns the API Url to get the share count for Facebook.
+     * @property {function} facebook.shareCount   - The method that extracts the number we need from the data returned from the API for Facebook.
+     *
+     * @property {Object} twitter                 - The settings for Twitter within Shr.
+     * @property {function} twitter.url           - The method that returns the API Url to get the share count for Twitter.
+     * @property {function} twitter.shareCount    - The method that extracts the number we need from the data returned from the API for Twitter.
+     *
+     * @property {Object} google                  - The settings for Google within Shr.
+     * @property {function} google.url            - The method that returns the API Url to get the share count for Google.
+     * @property {function} google.shareCount     - The method that extracts the number we need from the data returned from the API for Google.
+     *
+     * @property {Object} pinterest               - The settings for Pinterest within Shr.
+     * @property {function} pinterest.url         - The method that returns the API Url to get the share count for Pinterest.
+     * @property {function} pinterest.shareCount  - The method that extracts the number we need from the data returned from the API for Pinterest.
+     *
+     * @property {Object} github                  - The settings for GitHub within Shr.
+     * @property {function} github.url            - The method that returns the API Url to get the share count for GitHub.
+     * @property {function} github.shareCount     - The method that extracts the number we need from the data returned from the API for GitHub.
+     *
+     * @property {Object}   storage               - The object containing the settings for local storage.
+     * @property {function} storage.enabled       - Determines if local storage is enabled for the browser or not.
      */
      var settings = {
        facebook: {
@@ -100,7 +128,8 @@
 
     /**
      * Default Shr Config. All variables, settings and states are stored here
-     * and global.
+     * and global. These are the defaults. The user can edit these at will when
+     * initializing Shr.
      *
      * @typedef {Object} defaults
      * @type {Object}
@@ -114,37 +143,33 @@
      * @property {string}   count.position        - Inject the count before or after the link in the DOM
      * @property {boolean}  count.increment       - Determines if we increment the count on click. This assumes the share is valid.
      * @property {function} count.html            - Formats the count for display on the screen.
-     * @property {object}   count.value           - Describes the values we are looking for upon successful API request to get count.
-     * @property {string}   count.value.facebook  - The value of the JSON returned from Facebook that contains the share count.
-     * @property {string}   count.value.github    - The value of the JSON returned from GitHub that contains the share count.
-     * @property {object}   count.prefix          - Object that contains the prefix in the JSON that will lead us to the share count.
-     * @property {string}   count.prefix.github   - The prefix for a GitHub API request to get to the count returned.
      *
-     * @property {Object}   urls                  - The object containing the URLs for the sharing networks.
-     * @property {function} urls.facebook         - The function that returns the Facebook URL for getting the share count.
-     * @property {function} urls.pinterest        - The function that returns the Pinterest URL for getting the share count.
-     * @property {function} urls.github           - The function that returns the GitHub URL for getting the share count.
+     * @property {Object}   google                - The object containing all configuration variables for Google.
+     * @property {Object}   google.popup          - The object containing the widths and heights for the Google popup window.
+     * @property {number}   google.popup.width    - The width of the Google Popup window.
+     * @property {number}   google.popup.height   - The height of the Google Popup window.
      *
-     * @property {Object}   popup                 - The object containing the widths and heights for the sharing networks popup windows.
-     * @property {Object}   popup.google          - The object containing the width and height for a Google popup to share the URL.
-     * @property {number}   popup.google.width    - The width of the Google Popup window.
-     * @property {number}   popup.google.height   - The height of the Google Popup window.
-     * @property {Object}   popup.facebook        - The object containing the width and height for a Facebook popup to share the URL.
-     * @property {number}   popup.facebook.width  - The width of the Facebook Popup window.
-     * @property {number}   popup.facebook.height - The height of the Facebook Popup window.
-     * @property {Object}   popup.twitter         - The object containing the width and height for a Twitter popup to share the URL.
-     * @property {number}   popup.twitter.width   - The width of the Twitter Popup window.
-     * @property {number}   popup.twitter.height  - The height of the Twitter Popup window.
-     * @property {Object}   popup.pinterest       - The object containing the width and height for a Pinterest popup to share the URL.
-     * @property {number}   popup.pinterest.width - The width of the Pinterest Popup window.
-     * @property {number}   popup.pinterest.height- The height of the Pinterest Popup window.
+     * @property {Object}   facebook              - The object containing all configuration variables for Facebook.
+     * @property {Object}   facebook.popup        - The object containing the widths and heights for the Facebook popup window.
+     * @property {number}   facebook.popup.width  - The width of the Facebook Popup window.
+     * @property {number}   facebook.popup.height - The height of the Facebook Popup window.
      *
-     * @property {Object}   storage               - The object containing the settings for local storage.
-     * @property {string}   storage.key           - The key that the storage will use to access Shr data.
-     * @property {function} storage.enabled       - The function that determines if local storage is available.
-     * @property {number}   storage.ttl           - The time to live for the local storage values if available.
+     * @property {Object}   twitter                - The object containing all configuration variables for Twitter.
+     * @property {Object}   twitter.popup          - The object containing the widths and heights for the Twitter popup window.
+     * @property {number}   twitter.popup.width    - The width of the Twitter Popup window.
+     * @property {number}   twitter.popup.height   - The height of the Twitter Popup window.
      *
-     * @property {Object}   tokens                - The object containing the API tokens for the sharing networks.
+     * @property {Object}   pinterest              - The object containing all configuration variables for Pinterest.
+     * @property {Object}   pinterest.popup        - The object containing the widths and heights for the Pinterest popup window.
+     * @property {number}   pinterest.popup.width  - The width of the Pinterest Popup window.
+     * @property {number}   pinterest.popup.height - The height of the Pinterest Popup window.
+     *
+     * @property {Object}   github                 - The object containing all configuration variables for GitHub.
+     * @property {Object}   github.tokens          - The object containing optional authentication tokens for GitHub.
+     *
+     * @property {Object}   storage                - The object containing the settings for local storage.
+     * @property {string}   storage.key            - The key that the storage will use to access Shr data.
+     * @property {number}   storage.ttl            - The time to live for the local storage values if available.
      */
     var defaults = {
         selector: 'data-shr-network',
@@ -188,8 +213,7 @@
         storage: {
           key: 'shr',
           ttl: 300000,
-        },
-        tokens: {},
+        }
     };
 
     /**
