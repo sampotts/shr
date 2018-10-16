@@ -13,9 +13,7 @@
 (function( api ) {
     'use strict';
 
-    /**
-     * Initializes the config variable. This will be set with the defaults correctly.
-     */
+    // Initializes the config variable. This will be set with the defaults correctly.
     var config;
 
     /**
@@ -111,9 +109,8 @@
 
        storage: {
          enabled: (function() {
-             /*
-               Try to use local storage (it might be disabled, e.g. user is in private mode)
-             */
+             // Try to use local storage (it might be disabled,
+             // e.g. user is in private mode)
              try {
                  var key = '___test';
                  window.localStorage.setItem(key, key);
@@ -216,14 +213,10 @@
         }
     };
 
-    /**
-     * Initializes the log method for logging errors when debugging.
-     */
+    // Initializes the log method for logging errors when debugging.
     var log = function() {};
 
-    /**
-     * Initializes the error method for catching and displaying errors when debugging.
-     */
+    // Initializes the error method for catching and displaying errors when debugging.
     var error = function() {};
 
     /**
@@ -242,14 +235,10 @@
      * @param {number} number - The number being formatted.
      */
     function formatNumber( number ) {
-        /*
-          Work out whether decimal separator is . or , for localised numbers
-        */
+        // Work out whether decimal separator is . or , for localised numbers
         var decimalSeparator = /\./.test((1.1).toLocaleString()) ? '.' : ',';
 
-        /*
-          Round n to an integer and present
-        */
+        // Round n to an integer and present
         var re = new RegExp('\\' + decimalSeparator + '\\d+$');
         return Math.round(number)
             .toLocaleString()
@@ -265,29 +254,21 @@
      * @param {boolean} toggle      - Whether we should add an event listener or remove it.
      */
     function toggleHandler( element, events, callback, toggle ) {
-        /*
-          Split the events string into a list by spaces.
-        */
+        // Split the events string into a list by spaces.
         var eventList = events.split(' ');
 
-        /*
-          If a nodelist is passed, call itself on each node
-        */
+        // If a nodelist is passed, call itself on each node
         if (element instanceof NodeList) {
             for (var x = 0; x < element.length; x++) {
                 if (element[x] instanceof Node) {
-                    /*
-                      Recursively call the toggle handler on each node list event.
-                    */
+                    // Recursively call the toggle handler on each node list event.
                     toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
                 }
             }
             return;
         }
 
-        /*
-          If a single node is passed, bind the event listener
-        */
+        // If a single node is passed, bind the event listener
         for (var i = 0; i < eventList.length; i++) {
             element[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, false);
         }
@@ -317,10 +298,8 @@
      * @param {Object} source       - The object being merged
      */
     function extend( destination, source ) {
-        /*
-          Iterates over all of the properties in the source object to merge
-          with the destination.
-        */
+        // Iterates over all of the properties in the source
+        // object to merge with the destination.
         for ( var property in source ) {
             if (source[property] && source[property].constructor && source[property].constructor === Object) {
                 destination[property] = destination[property] || {};
@@ -330,9 +309,7 @@
             }
         }
 
-        /*
-          Returns the merged and extended object.
-        */
+        // Returns the merged and extended object.
         return destination;
     }
 
@@ -343,64 +320,46 @@
      * @param {Object} shr    - The Shr object to grab configurations from.
      */
     function popup( event, shr ) {
-        /*
-          Only popup if we need to...
-        */
+        // Only popup if we need to...
         if (! config[shr.network].popup ) {
             return;
         }
 
-        /*
-          Prevent the link opening
-        */
+        // Prevent the link opening
         event.preventDefault();
 
-        /*
-          Set variables for the popup
-        */
+        // Set variables for the popup
         var size = config[shr.network].popup;
         var url = shr.link.href;
         var width = size.width;
         var height = size.height;
         var name = 'window-' + shr.network;
 
-        /*
-          If window already exists, just focus it
-        */
+        // If window already exists, just focus it
         if (window[name] && !window[name].closed) {
             window[name].focus();
         } else {
-            /*
-              Get position
-            */
+            // Get position
             var left = window.screenLeft !== undefined ? window.screenLeft : screen.left;
             var top = window.screenTop !== undefined ? window.screenTop : screen.top;
 
-            /*
-              Open in the centre of the screen
-            */
+            // Open in the centre of the screen
             var x = screen.width / 2 - width / 2 + left;
             var y = screen.height / 2 - height / 2 + top;
 
-            /*
-              Open that window
-            */
+            // Open that window
             window[name] = window.open(
                 url,
                 shr.network,
                 'top=' + y + ',left=' + x + ',width=' + width + ',height=' + height
             );
 
-            /*
-              Focus new window
-            */
+            // Focus new window
             window[name].focus();
         }
 
-        /*
-          Nullify opener to prevent "tab nabbing"
-          https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
-        */
+        // Nullify opener to prevent "tab nabbing"
+        // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
         window[name].opener = null;
     }
 
@@ -426,29 +385,21 @@
      * @param {function} callback   - The callback funciton once the API completes the request.
      */
     function getJSONP( url, callback ) {
-        /*
-          Generate a random callback
-        */
+        // Generate a random callback
         var name = 'jsonp_callback_' + Math.round(100000 * Math.random());
 
-        /*
-          Cleanup to prevent memory leaks and hit original callback
-        */
+        // Cleanup to prevent memory leaks and hit original callback
         window[name] = function(data) {
             delete window[name];
             document.body.removeChild(script);
             callback(data);
         };
 
-        /*
-          Create a faux script
-        */
+        // Create a faux script
         var script = document.createElement('script');
         script.setAttribute('src', url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + name);
 
-        /*
-          Inject to the body
-        */
+        // Inject to the body
         document.body.appendChild(script);
     }
 
@@ -456,14 +407,10 @@
      * Gets the stored counts from local storage if needed.
      */
     function getStorage() {
-        /*
-          Checks if storage is enabled and has the shr key.
-        */
+        // Checks if storage is enabled and has the shr key.
         if ( config.storage.enabled && config.storage.key in window.localStorage ) {
-            /*
-              Sets the global storage to the data returned from
-              accessing the storage.
-            */
+            // Sets the global storage to the data returned from
+            // accessing the storage.
             storage = {
                 data: JSON.parse(window.localStorage[config.storage.key]),
                 ttl: window.localStorage[config.storage.key + '_ttl'],
@@ -477,16 +424,12 @@
      * @param {Object} data   - The share count data.
      */
     function setStorage( data ) {
-        /*
-          Ensures that local storage is enabled.
-        */
+        // Ensures that local storage is enabled.
         if (!config.storage.enabled) {
             return;
         }
 
-        /*
-          Store the result and set a TTL
-        */
+        // Store the result and set a TTL
         window.localStorage[config.storage.key] = JSON.stringify(data);
         window.localStorage[config.storage.key + '_ttl'] = Date.now() + config.storage.ttl;
     }
@@ -500,9 +443,7 @@
      * @param {Object} shr  - The Shr object.
      */
     function parseUrl( shr ) {
-        /*
-          Get the url that is being shared based on the network
-        */
+        // Get the url that is being shared based on the network
         switch ( shr.network ) {
             case 'facebook':
                 return getParameterByName( shr.link.search, 'u' );
@@ -531,15 +472,11 @@
      */
     function formatUrl( shr ) {
         if ( shr.network in config )  {
-            /*
-              Build the URL for the JSON P based off of network.
-            */
+            // Build the URL for the JSON P based off of network.
             switch( shr.network ){
-              /*
-                GitHub requires a repo for the API call, so we need to build
-                the URL. We will also need tokens if they were passed in to build
-                the URL.
-              */
+              // GitHub requires a repo for the API call, so we need to build
+              // the URL. We will also need tokens if they were passed in to build
+              // the URL.
               case 'github':
                 return config[ shr.network ]['url']( shr.url, config.github.tokens );
               break;
@@ -549,10 +486,8 @@
             }
         }
 
-        /*
-          If the URL is not in the Shr network object,
-          return null.
-        */
+        // If the URL is not in the Shr network object,
+        // return null.
         return null;
     }
 
@@ -563,34 +498,27 @@
      * @param {function} callback   - The callback for when the request is completed.
      */
     function getCount( shr, callback ) {
-        /*
-          Format the JSONP endpoint
-        */
+        // Format the JSONP endpoint
         var url = formatUrl( shr );
 
-        /*
-          If there's an endpoint. For some social networks, you can't
-          get the share count (like Twitter) so we won't have any data. The link
-          will be to share it, but you won't get a count of how many people have.
-        */
+
+        // If there's an endpoint. For some social networks, you can't
+        // get the share count (like Twitter) so we won't have any data. The link
+        // will be to share it, but you won't get a count of how many people have.
         if ( !isNullOrEmpty( url ) ) {
-            /*
-              Try from cache first
-            */
+            // Try from cache first
             if ( config.storage.enabled ) {
                 var key = parseUrl( shr );
 
-                /*
-                  Get from storage if it exists, the network is in the key
-                  based off of the URL and the ttl is still valid.
-                */
+
+                // Get from storage if it exists, the network is in the key
+                // based off of the URL and the ttl is still valid.
+
                 if ( key in storage.data
                       && shr.network in storage.data[key]
                       && storage.ttl > Date.now() ) {
 
-                    /*
-                      This will display the count.
-                    */
+                    // This will display the count.
                     callback.call( null, storage.data[key][ shr.network ] );
 
                     return;
@@ -598,41 +526,27 @@
             }
         }
 
-        /*
-          When we get here, this means the cached counts are not valid,
-          or don't exist. We will call the API if the URL is available
-          at this point.
-        */
+        // When we get here, this means the cached counts are not valid,
+        // or don't exist. We will call the API if the URL is available
+        // at this point.
         if ( !isNullOrEmpty( url ) ) {
-            /*
-              Runs a GET JSON P request on the URL.
-            */
+            // Runs a GET JSON P request on the URL.
             getJSONP( url, function( data ) {
-                /*
-                  Cache in local storage (that expires)
-                */
+                // Cache in local storage (that expires)
                 if ( config.storage.enabled ) {
-                    /*
-                      Create the initial object, if it's null
-                    */
+                    // Create the initial object, if it's null
                     if ( !( key in storage.data ) ) {
                         storage.data[key] = {};
                     }
 
-                    /*
-                      Add to storage
-                    */
+                    // Add to storage
                     storage.data[key][shr.network] = data;
 
-                    /*
-                      Store the result
-                    */
+                    // Store the result
                     setStorage( storage.data );
                 }
 
-                /*
-                  Calls the callback to display the data count.
-                */
+                // Calls the callback to display the data count.
                 callback.call( null, data );
             });
         }
@@ -659,51 +573,35 @@
         var count = 0;
         var custom = shr.link.getAttribute('data-shr-display');
 
-        /*
-          Get value based on config
-        */
+        // Get value based on config
         if ( !isNullOrEmpty( custom ) ) {
             count = data[custom];
         } else if ( shr.network in config ) {
             count = config[ shr.network ].shareCount( data );
         }
 
-        /*
-          Parse
-        */
+        // Parse
         count = parseInt( count );
 
-        /*
-          Store count in the Shr object.
-        */
+        // Store count in the Shr object.
         shr.count = count;
 
-        /*
-          If we're incrementing (e.g. on click)
-        */
+        // If we're incrementing (e.g. on click)
         if ( increment ) {
-            /*
-              Increment the current value if we have it
-            */
+            // Increment the current value if we have it
             if ( shr.display ) {
                 count = parseInt( shr.display.innerText );
             }
             count++;
         }
 
-        /*
-          Only display if there's a count
-        */
+        // Only display if there's a count
         if (count > 0 || config.count.displayZero) {
-            /*
-              Standardize position
-            */
+            // Standardize position
             config.count.position = config.count.position.toLowerCase();
             var isAfter = config.count.position === 'after';
 
-            /*
-              Format
-            */
+            // Format
             var label;
             if (config.count.format && shr.count > 1000000) {
                 label = Math.round(count / 1000000) + 'M';
@@ -713,23 +611,17 @@
                 label = formatNumber(count);
             }
 
-            /*
-              Update or insert
-            */
+            // Update or insert
             if (shr.display) {
                 shr.display.textContent = label;
             } else {
-                /*
-                  Insert count display
-                */
+                // Insert count display
                 shr.link.insertAdjacentHTML(
                     isAfter ? 'afterend' : 'beforebegin',
                     config.count.html(label, config.count.classname, config.count.position)
                 );
 
-                /*
-                  Store reference
-                */
+                // Store reference
                 shr.display = shr.link[isAfter ? 'nextSibling' : 'previousSibling'];
             }
         }
@@ -748,37 +640,25 @@
             return false;
         }
 
-        /*
-          Set the link
-        */
+        // Set the link
         shr.link = link;
 
-        /*
-          Get the type (this is super important)
-        */
+        // Get the type (this is super important)
         shr.network = link.getAttribute( config.selector );
 
-        /*
-          Get the url we're sharing
-        */
+        // Get the url we're sharing
         shr.url = parseUrl( shr );
 
-        /*
-          Get the share count
-        */
+        // Get the share count
         getCount( shr, function( data ) {
             displayCount( shr, data );
         });
 
-        /*
-          Listen for events
-        */
+        // Listen for events
         on( shr.link, 'click', function(event) {
             popup( event, shr );
 
-            /*
-              Refresh the share count
-            */
+            // Refresh the share count
             getCount(
                 shr,
                 function(data) {
@@ -787,9 +667,7 @@
             );
         });
 
-        /*
-          Return the instance
-        */
+        // Return the instance
         return shr;
     }
 
@@ -799,57 +677,37 @@
      * @param {Object} options      - The user defined options to extend to the defaults
      */
     api.setup = function( options ) {
-        /*
-          Extend the config with the options with user specified
-        */
+        // Extend the config with the options with user specified
         config = extend( defaults, options );
 
-        /*
-          Include the settings into the config so the user doesn't
-          accidentally overwrite important settings.
-        */
+        // Include the settings into the config so the user doesn't
+        // accidentally overwrite important settings.
         config = extend( config, settings );
 
-        /*
-          Selects all of the elements based on the config and the selector
-          specified.
-        */
+        // Selects all of the elements based on the config and the selector
+        // specified.
         var elements = document.querySelectorAll( '['+config.selector+']' );
 
-        /*
-          Gets the storage data from what was already set. This will
-          set the global storage parameter.
-        */
+        // Gets the storage data from what was already set. This will
+        // set the global storage parameter.
         getStorage();
 
-        /*
-          Create an Shr link instance for each element
-        */
+        // Create an Shr link instance for each element
         for (var i = elements.length - 1; i >= 0; i--) {
-            /*
-              Get the current element
-            */
+            // Get the current element
             var link = elements[i];
 
-            /*
-              Setup a link instance and add to the element
-            */
+            // Setup a link instance and add to the element
             if (typeof link.shr === 'undefined') {
-                /*
-                  Create new instance
-                */
+                // Create new instance
                 var instance = new Shr( link );
 
-                /*
-                  Set link to false if setup failed
-                */
+                // Set link to false if setup failed
                 link.shr = Object.keys( instance ).length ? instance : false;
             }
         }
 
-        /*
-          Debugging
-        */
+        // Debugging
         if ( config.debug && window.console ) {
             log = window.console.log.bind( console );
             error = window.console.error.bind( console );
