@@ -175,6 +175,7 @@ gulp.task('watch', function() {
     // Core
     gulp.watch(paths.shr.src.js, tasks.js);
     gulp.watch(paths.shr.src.less, tasks.less);
+    gulp.watch(paths.shr.src.sass, tasks.sass);
     gulp.watch(paths.shr.src.sprite, ['sprite']);
 
     // Docs
@@ -184,7 +185,7 @@ gulp.task('watch', function() {
 
 // Default gulp task
 gulp.task('default', function() {
-    run(tasks.js, tasks.less, 'sprite', 'watch');
+    run(tasks.js, tasks.less, tasks.sass, 'sprite', 'watch');
 });
 
 // Publish a version to CDN and docs
@@ -241,7 +242,7 @@ gulp.task('cdn', function() {
         .pipe(s3(aws.cdn, options.cdn));
 });
 
-// Publish to Docs bucket
+//Publish to Docs bucket
 gulp.task('docs', function() {
     console.log('Uploading ' + version + ' docs to ' + aws.docs.bucket);
 
@@ -289,5 +290,5 @@ gulp.task('open', function() {
 
 // Do everything
 gulp.task('publish', function() {
-    run(tasks.js, tasks.less, 'sprite', 'cdn', 'docs');
+    run(tasks.js, tasks.less, tasks.sass, 'sprite', 'cdn', 'docs');
 });

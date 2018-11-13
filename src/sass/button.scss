@@ -1,0 +1,107 @@
+// ==========================================================================
+// Button styling
+// ==========================================================================
+
+// Shared
+.shr-button,
+.share-count {
+    vertical-align: middle;
+    border-radius: $shr-button-border-radius;
+    font-size: $shr-font-size;
+    font-family: $shr-font-family;
+    font-weight: $shr-font-weight;
+    @include font-smoothing($shr-font-smoothing);
+}
+
+.shr-button + .shr-button,
+.share-count--after + .shr-button,
+.shr-button + .share-count--before {
+    margin-left: ceil($shr-padding-base / 4);
+}
+
+// Buttons
+.shr-button {
+    display: inline-flex;
+    align-items: center;
+    padding: ceil($shr-padding-base / 4) ceil($shr-padding-base / 2);
+    @include shr-button-styles();
+    transition: all 0.3s ease;
+    color: $shr-button-text-color;
+    text-decoration: none;
+    user-select: none;
+
+    // Focus styles are handled in the mixin
+    &:focus {
+        outline: 0;
+    }
+
+    // Icons
+    svg {
+        display: inline-block;
+        fill: currentColor;
+        width: 16px;
+        height: 16px;
+        margin-right: ceil($shr-padding-base / 2);
+    }
+
+    // Network specific styles
+    &-facebook {
+        @include shr-button-styles($shr-button-facebook-bg-color);
+    }
+    &-twitter {
+        @include shr-button-styles($shr-button-twitter-bg-color);
+    }
+    &-pinterest {
+        @include shr-button-styles($shr-button-pinterest-bg-color);
+    }
+    &-google {
+        @include shr-button-styles($shr-button-google-bg-color);
+    }
+    &-github {
+        @include shr-button-styles($shr-button-github-bg-color, darken($shr-button-github-bg-color, 10%));
+    }
+}
+
+// Count bubble
+.share-count {
+    display: inline-block;
+    position: relative;
+
+    padding: ($shr-padding-base / 4) ($shr-padding-base / 3);
+    background: $shr-button-count-bg;
+    border: $shr-button-border-width solid $shr-button-count-border-color;
+    text-align: center;
+    min-width: 20px;
+    color: $shr-button-count-text-color;
+
+    // The arrow
+    &::before {
+        content: "";
+        position: absolute;
+        width: $shr-button-count-arrow-size;
+        height: $shr-button-count-arrow-size;
+        top: 50%;
+        margin-top: -($shr-button-count-arrow-size / 2);
+        background: inherit;
+        border: inherit;
+        border-width: $shr-button-border-width 0 0 $shr-button-border-width;
+    }
+}
+
+.share-count--after {
+    margin-left: ($shr-padding-base / 2);
+
+    &::before {
+        left: $shr-button-border-width;
+        transform: rotate(-45deg) translate(-50%, -50%);
+    }
+}
+
+.share-count--before {
+    margin-right: ($shr-padding-base / 2);
+
+    &::before {
+        right: $shr-button-border-width;
+        transform: rotate(135deg) translate(-50%, -50%);
+    }
+}

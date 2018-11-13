@@ -13,8 +13,7 @@
 (function( api ) {
     'use strict';
 
-    //Initializes the config variable.
-    //This will be set with the defaults correctly.
+    // Initializes the config variable. This will be set with the defaults correctly.
     var config;
 
     /**
@@ -30,8 +29,104 @@
     };
 
     /**
+     * Settings. These are uneditable by the user. These will get merged into
+     * the global config after the user defaults so the user can't overwrite these
+     * values.
+     *
+     * @typedef {Object} settings
+     * @type {Object}
+     *
+     * @property {Object} facebook                 - The settings for Facebook within Shr.
+     * @property {function} facebook.url          - The method that returns the API Url to get the share count for Facebook.
+     * @property {function} facebook.shareCount   - The method that extracts the number we need from the data returned from the API for Facebook.
+     *
+     * @property {Object} twitter                 - The settings for Twitter within Shr.
+     * @property {function} twitter.url           - The method that returns the API Url to get the share count for Twitter.
+     * @property {function} twitter.shareCount    - The method that extracts the number we need from the data returned from the API for Twitter.
+     *
+     * @property {Object} google                  - The settings for Google within Shr.
+     * @property {function} google.url            - The method that returns the API Url to get the share count for Google.
+     * @property {function} google.shareCount     - The method that extracts the number we need from the data returned from the API for Google.
+     *
+     * @property {Object} pinterest               - The settings for Pinterest within Shr.
+     * @property {function} pinterest.url         - The method that returns the API Url to get the share count for Pinterest.
+     * @property {function} pinterest.shareCount  - The method that extracts the number we need from the data returned from the API for Pinterest.
+     *
+     * @property {Object} github                  - The settings for GitHub within Shr.
+     * @property {function} github.url            - The method that returns the API Url to get the share count for GitHub.
+     * @property {function} github.shareCount     - The method that extracts the number we need from the data returned from the API for GitHub.
+     *
+     * @property {Object}   storage               - The object containing the settings for local storage.
+     * @property {function} storage.enabled       - Determines if local storage is enabled for the browser or not.
+     */
+     var settings = {
+       facebook: {
+         url: function( url ) {
+             return 'https://graph.facebook.com/?id=' + url;
+         },
+         shareCount: function( data ){
+           return data.share.share_count;
+         }
+       },
+
+       twitter: {
+         url: function( url ){
+            return null;
+         },
+         shareCount: function( data ){
+           return null;
+         }
+       },
+
+       google: {
+         url: function( url ){
+            return null;
+         },
+         shareCount: function( data ){
+           return null;
+         }
+       },
+
+       pinterest: {
+         url: function( url ) {
+            return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
+         },
+         shareCount: function( data ){
+            return data.count;
+         }
+       },
+
+       github: {
+         url: function( repo, token ) {
+           return (
+               'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
+           );
+         },
+         shareCount: function( data ){
+           return data.data.stargazers_count;
+         }
+       },
+
+       storage: {
+         enabled: (function() {
+             // Try to use local storage (it might be disabled,
+             // e.g. user is in private mode)
+             try {
+                 var key = '___test';
+                 window.localStorage.setItem(key, key);
+                 window.localStorage.removeItem(key);
+                 return true;
+             } catch (e) {
+                 return false;
+             }
+         })(),
+       }
+     };
+
+    /**
      * Default Shr Config. All variables, settings and states are stored here
-     * and global.
+     * and global. These are the defaults. The user can edit these at will when
+     * initializing Shr.
      *
      * @typedef {Object} defaults
      * @type {Object}
@@ -45,40 +140,36 @@
      * @property {string}   count.position        - Inject the count before or after the link in the DOM
      * @property {boolean}  count.increment       - Determines if we increment the count on click. This assumes the share is valid.
      * @property {function} count.html            - Formats the count for display on the screen.
-     * @property {object}   count.value           - Describes the values we are looking for upon successful API request to get count.
-     * @property {string}   count.value.facebook  - The value of the JSON returned from Facebook that contains the share count.
-     * @property {string}   count.value.github    - The value of the JSON returned from GitHub that contains the share count.
-     * @property {object}   count.prefix          - Object that contains the prefix in the JSON that will lead us to the share count.
-     * @property {string}   count.prefix.github   - The prefix for a GitHub API request to get to the count returned.
      *
-     * @property {Object}   urls                  - The object containing the URLs for the sharing networks.
-     * @property {function} urls.facebook         - The function that returns the Facebook URL for getting the share count.
-     * @property {function} urls.pinterest        - The function that returns the Pinterest URL for getting the share count.
-     * @property {function} urls.github           - The function that returns the GitHub URL for getting the share count.
+     * @property {Object}   google                - The object containing all configuration variables for Google.
+     * @property {Object}   google.popup          - The object containing the widths and heights for the Google popup window.
+     * @property {number}   google.popup.width    - The width of the Google Popup window.
+     * @property {number}   google.popup.height   - The height of the Google Popup window.
      *
-     * @property {Object}   popup                 - The object containing the widths and heights for the sharing networks popup windows.
-     * @property {Object}   popup.google          - The object containing the width and height for a Google popup to share the URL.
-     * @property {number}   popup.google.width    - The width of the Google Popup window.
-     * @property {number}   popup.google.height   - The height of the Google Popup window.
-     * @property {Object}   popup.facebook        - The object containing the width and height for a Facebook popup to share the URL.
-     * @property {number}   popup.facebook.width  - The width of the Facebook Popup window.
-     * @property {number}   popup.facebook.height - The height of the Facebook Popup window.
-     * @property {Object}   popup.twitter         - The object containing the width and height for a Twitter popup to share the URL.
-     * @property {number}   popup.twitter.width   - The width of the Twitter Popup window.
-     * @property {number}   popup.twitter.height  - The height of the Twitter Popup window.
-     * @property {Object}   popup.pinterest       - The object containing the width and height for a Pinterest popup to share the URL.
-     * @property {number}   popup.pinterest.width - The width of the Pinterest Popup window.
-     * @property {number}   popup.pinterest.height- The height of the Pinterest Popup window.
+     * @property {Object}   facebook              - The object containing all configuration variables for Facebook.
+     * @property {Object}   facebook.popup        - The object containing the widths and heights for the Facebook popup window.
+     * @property {number}   facebook.popup.width  - The width of the Facebook Popup window.
+     * @property {number}   facebook.popup.height - The height of the Facebook Popup window.
      *
-     * @property {Object}   storage               - The object containing the settings for local storage.
-     * @property {string}   storage.key           - The key that the storage will use to access Shr data.
-     * @property {function} storage.enabled       - The function that determines if local storage is available.
-     * @property {number}   storage.ttl           - The time to live for the local storage values if available.
+     * @property {Object}   twitter                - The object containing all configuration variables for Twitter.
+     * @property {Object}   twitter.popup          - The object containing the widths and heights for the Twitter popup window.
+     * @property {number}   twitter.popup.width    - The width of the Twitter Popup window.
+     * @property {number}   twitter.popup.height   - The height of the Twitter Popup window.
      *
-     * @property {Object}   tokens                - The object containing the API tokens for the sharing networks.
+     * @property {Object}   pinterest              - The object containing all configuration variables for Pinterest.
+     * @property {Object}   pinterest.popup        - The object containing the widths and heights for the Pinterest popup window.
+     * @property {number}   pinterest.popup.width  - The width of the Pinterest Popup window.
+     * @property {number}   pinterest.popup.height - The height of the Pinterest Popup window.
+     *
+     * @property {Object}   github                 - The object containing all configuration variables for GitHub.
+     * @property {Object}   github.tokens          - The object containing optional authentication tokens for GitHub.
+     *
+     * @property {Object}   storage                - The object containing the settings for local storage.
+     * @property {string}   storage.key            - The key that the storage will use to access Shr data.
+     * @property {number}   storage.ttl            - The time to live for the local storage values if available.
      */
     var defaults = {
-        selector: '[data-shr-network]',
+        selector: 'data-shr-network',
         count: {
             classname: 'share-count',
             displayZero: false,
@@ -87,64 +178,39 @@
             increment: true,
             html: function( count, classname, position) {
                 return '<span class="' + classname + ' ' + classname + '--' + position + '">' + count + '</span>';
-            },
-            value: {
-                facebook: 'share_count',
-                github: 'stargazers_count',
-            },
-            prefix: {
-                github: 'data',
-            },
+            }
         },
-        urls: {
-            facebook: function( url ) {
-                return 'https://graph.facebook.com/?id=' + url;
-            },
-            pinterest: function( url ) {
-                return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
-            },
-            github: function( repo, token ) {
-                return (
-                    'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
-                );
-            },
+        google: {
+          popup: {
+            width: 500,
+            height: 500
+          }
         },
-        popup: {
-            google: {
-                width: 500,
-                height: 500,
-            },
-            facebook: {
-                width: 640,
-                height: 270,
-            },
-            twitter: {
-                width: 640,
-                height: 240,
-            },
-            pinterest: {
-                width: 750,
-                height: 550,
-            },
+        facebook: {
+          popup: {
+            width: 640,
+            height: 270,
+          }
+        },
+        twitter: {
+          popup: {
+            width: 640,
+            height: 240
+          }
+        },
+        pinterest: {
+          popup: {
+            width: 750,
+            height: 550
+          }
+        },
+        github: {
+          tokens: {}
         },
         storage: {
-            key: 'shr',
-            enabled: (function() {
-                /*
-                  Try to use local storage (it might be disabled, e.g. user is in private mode)
-                */
-                try {
-                    var key = '___test';
-                    window.localStorage.setItem(key, key);
-                    window.localStorage.removeItem(key);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            })(),
-            ttl: 300000,
-        },
-        tokens: {},
+          key: 'shr',
+          ttl: 300000,
+        }
     };
 
     // Initializes the log method for logging errors when debugging.
@@ -169,8 +235,7 @@
      * @param {number} number - The number being formatted.
      */
     function formatNumber( number ) {
-        // Work out whether decimal separator is . or , for
-        // localised numbers
+        // Work out whether decimal separator is . or , for localised numbers
         var decimalSeparator = /\./.test((1.1).toLocaleString()) ? '.' : ',';
 
         // Round n to an integer and present
@@ -256,7 +321,7 @@
      */
     function popup( event, shr ) {
         // Only popup if we need to...
-        if (!(shr.network in config.popup)) {
+        if (! config[shr.network].popup ) {
             return;
         }
 
@@ -264,7 +329,7 @@
         event.preventDefault();
 
         // Set variables for the popup
-        var size = config.popup[shr.network];
+        var size = config[shr.network].popup;
         var url = shr.link.href;
         var width = size.width;
         var height = size.height;
@@ -301,7 +366,7 @@
     /**
      * Get URL parameter by name
      *
-     * @param {string} query  - The query link for the share count.
+     * @param {string} query  - The query part of the URL.
      * @param {string} name   - The name of the social network we are getting the share count for.
      */
     function getParameterByName( query, name ) {
@@ -370,38 +435,55 @@
     }
 
     /**
-     * Parse share url from button href
+     * Parse share url from button href. This returns the URL we are geting the
+     * share count for.
+     *
      * https://gist.github.com/jlong/2428561
      *
      * @param {Object} shr  - The Shr object.
      */
     function parseUrl( shr ) {
-        // Get the url based on the network
-        switch (shr.network) {
+        // Get the url that is being shared based on the network
+        switch ( shr.network ) {
             case 'facebook':
-                return getParameterByName(shr.link.search, 'u');
-
+                return getParameterByName( shr.link.search, 'u' );
+            break;
             case 'github':
                 return shr.link.pathname;
-
+            break;
+            case 'twitter':
+                return getParameterByName( shr.link.search, 'url' );
+            break;
+            case 'pinterest':
+                return getParameterByName( shr.link.search, 'url' );
+            break;
+            case 'google':
+                return getParameterByName( shr.link.search, 'url' );
+            break;
+            
             default:
-                return getParameterByName(shr.link.search, 'url');
+                return getParameterByName( shr.link.search, 'url' );
+            break;
         }
     }
 
     /**
      * String format an endpoint URL for JSONP
-     *
      * @param {Object} shr  - The Shr object.
      */
     function formatUrl( shr ) {
-        if ( shr.network in config.urls)  {
-            switch ( shr.network ) {
-                case 'github':
-                    return config.urls[shr.network](parseUrl(shr), config.tokens.github);
-
-                default:
-                    return config.urls[shr.network](encodeURIComponent(shr.url));
+        if ( shr.network in config )  {
+            // Build the URL for the JSON P based off of network.
+            switch( shr.network ){
+              // GitHub requires a repo for the API call, so we need to build
+              // the URL. We will also need tokens if they were passed in to build
+              // the URL.
+              case 'github':
+                return config[ shr.network ]['url']( shr.url, config.github.tokens );
+              break;
+              default:
+                return config[ shr.network ]['url']( encodeURIComponent( shr.url ) );
+              break;
             }
         }
 
@@ -420,22 +502,40 @@
         // Format the JSONP endpoint
         var url = formatUrl( shr );
 
+        // If there's an endpoint. For some social networks, you can't
+        // get the share count (like Twitter) so we won't have any data. The link
+        // will be to share it, but you won't get a count of how many people have.
+      
         // If there's an endpoint
+
         if ( !isNullOrEmpty( url ) ) {
             // Try from cache first
             if ( config.storage.enabled ) {
-                var key = parseUrl(shr);
+                var key = parseUrl( shr );
 
-                // Get from storage if it exists
-                if (key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
-                    callback.call(null, storage.data[key][shr.network]);
+
+                // Get from storage if it exists, the network is in the key
+                // based off of the URL and the ttl is still valid.
+
+                if ( key in storage.data
+                      && shr.network in storage.data[key]
+                      && storage.ttl > Date.now() ) {
+
+                    // This will display the count.
+                    callback.call( null, storage.data[key][ shr.network ] );
+
                     return;
                 }
             }
         }
 
+        // When we get here, this means the cached counts are not valid,
+        // or don't exist. We will call the API if the URL is available
+        // at this point.
+
         // Make the request
         if ( !isNullOrEmpty( url ) ) {
+            // Runs a GET JSON P request on the URL.
             getJSONP( url, function( data ) {
                 // Cache in local storage (that expires)
                 if ( config.storage.enabled ) {
@@ -451,22 +551,9 @@
                     setStorage( storage.data );
                 }
 
+                // Calls the callback to display the data count.
                 callback.call( null, data );
             });
-        }
-    }
-
-    /**
-     * Get the value for count
-     *
-     * @param {string} network  - The name of the network we are getting the count for.
-     * @param {Object} data     - The data returned from the API
-     */
-    function prefixData( network, data ) {
-        if ( network in config.count.prefix ) {
-            return data[config.count.prefix[network]];
-        } else {
-            return data;
         }
     }
 
@@ -505,10 +592,8 @@
         // Get value based on config
         if ( !isNullOrEmpty( custom ) ) {
             count = data[custom];
-        } else if (shr.network in config.count.value) {
-            count = data[config.count.value[shr.network]];
-        } else {
-            count = data.count;
+        } else if ( shr.network in config ) {
+            count = config[ shr.network ].shareCount( data );
         }
 
         // Parse
@@ -523,6 +608,7 @@
             if (shr.display) {
                 count = parseInt(shr.display.innerText);
             }
+          
             count++;
         }
 
@@ -575,7 +661,7 @@
         shr.link = link;
 
         // Get the type (this is super important)
-        shr.network = link.getAttribute('data-shr-network');
+        shr.network = link.getAttribute( config.selector );
 
         // Get the url we're sharing
         shr.url = parseUrl( shr );
@@ -593,9 +679,8 @@
             getCount(
                 shr,
                 function(data) {
-                    displayCount(shr, data, true);
-                },
-                config.count.increment
+                  displayCount( shr, data, config.count.increment );
+                }
             );
         });
 
@@ -606,32 +691,22 @@
     /**
      * Expose setup function.
      *
-     * @param {NodeList} elements   - The list of Shr elements.
      * @param {Object} options      - The user defined options to extend to the defaults
      */
-    api.setup = function( elements, options ) {
-        // Select the elements
-        // Assume elements is a NodeList by default
-        if (typeof elements === 'string') {
-            elements = document.querySelectorAll(elements);
-        } else if (elements instanceof HTMLElement) {
-            // Single HTMLElement passed
-            elements = [elements];
-        } else if (!(elements instanceof NodeList)) {
-            // No selector passed, possibly options as first argument
-            // If options are the first argument
-            if (typeof options === 'undefined' && typeof elements === 'object') {
-                options = elements;
-            }
-
-            // Use default selector
-            elements = document.querySelectorAll(defaults.selector);
-        }
-
-        // Extend the default options with user specified
+    api.setup = function( options ) {
+        // Extend the config with the options with user specified
         config = extend( defaults, options );
 
-        // Get the storage
+        // Include the settings into the config so the user doesn't
+        // accidentally overwrite important settings.
+        config = extend( config, settings );
+
+        // Selects all of the elements based on the config and the selector
+        // specified.
+        var elements = document.querySelectorAll( '['+config.selector+']' );
+
+        // Gets the storage data from what was already set. This will
+        // set the global storage parameter.
         getStorage();
 
         // Create a link instance for each element
@@ -651,8 +726,8 @@
 
         // Debugging
         if ( config.debug && window.console ) {
-            log = window.console.log.bind(console);
-            error = window.console.error.bind(console);
+            log = window.console.log.bind( console );
+            error = window.console.error.bind( console );
         }
     };
 })(window.shr = window.shr || {});

@@ -4,7 +4,7 @@
             "shr.css":     ["src/less/shr.less"]
         },
         "sass": {
-            "shr.css":     ["src/less/shr.sass"]
+            "shr-sass.css":["src/sass/shr-sass.scss"]
         },
         "js": {
             "shr.js":      ["src/js/shr.js"]
