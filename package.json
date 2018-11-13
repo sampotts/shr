@@ -27,11 +27,20 @@
     "scripts": {
         "preinstall": "npm install -g gulp"
     },
-    "keywords": ["Facebook", "Twitter", "Pinterest", "Google Plus", "Sharing", "Share buttons"],
+    "keywords": [
+        "Facebook",
+        "Twitter",
+        "Pinterest",
+        "Google Plus",
+        "Sharing",
+        "Share buttons"
+    ],
     "repository": {
         "type": "git",
         "url": "git://github.com/sampotts/shr.git"
     },
-    "authors": ["Sam Potts <sam@potts.es>"],
+    "authors": [
+        "Sam Potts <sam@potts.es>"
+    ],
     "license": "MIT"
 }
