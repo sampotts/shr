@@ -460,6 +460,7 @@
             case 'google':
                 return getParameterByName( shr.link.search, 'url' );
             break;
+            
             default:
                 return getParameterByName( shr.link.search, 'url' );
             break;
@@ -501,10 +502,12 @@
         // Format the JSONP endpoint
         var url = formatUrl( shr );
 
-
         // If there's an endpoint. For some social networks, you can't
         // get the share count (like Twitter) so we won't have any data. The link
         // will be to share it, but you won't get a count of how many people have.
+      
+        // If there's an endpoint
+
         if ( !isNullOrEmpty( url ) ) {
             // Try from cache first
             if ( config.storage.enabled ) {
@@ -529,13 +532,15 @@
         // When we get here, this means the cached counts are not valid,
         // or don't exist. We will call the API if the URL is available
         // at this point.
+
+        // Make the request
         if ( !isNullOrEmpty( url ) ) {
             // Runs a GET JSON P request on the URL.
             getJSONP( url, function( data ) {
                 // Cache in local storage (that expires)
                 if ( config.storage.enabled ) {
                     // Create the initial object, if it's null
-                    if ( !( key in storage.data ) ) {
+                    if (!(key in storage.data)) {
                         storage.data[key] = {};
                     }
 
@@ -570,8 +575,19 @@
      * @param {boolean} increment   - Determines if we should increment the count or not.
      */
     function displayCount( shr, data, increment ) {
+        // Prefix data
+        // eg. GitHub uses data.data.forks, vs facebooks data.shares
+        data = prefixData(shr.network, data);
+
         var count = 0;
         var custom = shr.link.getAttribute('data-shr-display');
+
+        // Facebook changed the schema of their data
+        switch (shr.network) {
+            case 'facebook':
+                data = data.share;
+                break;
+        }
 
         // Get value based on config
         if ( !isNullOrEmpty( custom ) ) {
@@ -581,17 +597,18 @@
         }
 
         // Parse
-        count = parseInt( count );
+        count = parseInt(count);
 
-        // Store count in the Shr object.
+        // Store count
         shr.count = count;
 
         // If we're incrementing (e.g. on click)
-        if ( increment ) {
+        if (increment) {
             // Increment the current value if we have it
-            if ( shr.display ) {
-                count = parseInt( shr.display.innerText );
+            if (shr.display) {
+                count = parseInt(shr.display.innerText);
             }
+          
             count++;
         }
 
@@ -650,7 +667,7 @@
         shr.url = parseUrl( shr );
 
         // Get the share count
-        getCount( shr, function( data ) {
+        getCount( shr, function(data) {
             displayCount( shr, data );
         });
 
@@ -692,7 +709,7 @@
         // set the global storage parameter.
         getStorage();
 
-        // Create an Shr link instance for each element
+        // Create a link instance for each element
         for (var i = elements.length - 1; i >= 0; i--) {
             // Get the current element
             var link = elements[i];
@@ -700,10 +717,10 @@
             // Setup a link instance and add to the element
             if (typeof link.shr === 'undefined') {
                 // Create new instance
-                var instance = new Shr( link );
+                var instance = new Shr(link);
 
                 // Set link to false if setup failed
-                link.shr = Object.keys( instance ).length ? instance : false;
+                link.shr = Object.keys(instance).length ? instance : false;
             }
         }
 
