@@ -460,7 +460,7 @@
             case 'google':
                 return getParameterByName( shr.link.search, 'url' );
             break;
-            
+
             default:
                 return getParameterByName( shr.link.search, 'url' );
             break;
@@ -505,7 +505,7 @@
         // If there's an endpoint. For some social networks, you can't
         // get the share count (like Twitter) so we won't have any data. The link
         // will be to share it, but you won't get a count of how many people have.
-      
+
         // If there's an endpoint
 
         if ( !isNullOrEmpty( url ) ) {
@@ -608,7 +608,7 @@
             if (shr.display) {
                 count = parseInt(shr.display.innerText);
             }
-          
+
             count++;
         }
 
