@@ -3,14 +3,14 @@
  * @version 1.1.1
  * @author 	Sam Potts
  * @license The MIT License (MIT)
-*/
+ */
 
 /**
  * Defines the global module that handles all of the functionality of Shr
  *
  * @param {Object} api  - The API to extend with the functions of Shr
  */
-(function( api ) {
+(function(api) {
     'use strict';
 
     // Initializes the config variable. This will be set with the defaults correctly.
@@ -59,69 +59,69 @@
      * @property {Object}   storage               - The object containing the settings for local storage.
      * @property {function} storage.enabled       - Determines if local storage is enabled for the browser or not.
      */
-     var settings = {
-       facebook: {
-         url: function( url ) {
-             return 'https://graph.facebook.com/?id=' + url;
-         },
-         shareCount: function( data ){
-           return data.share.share_count;
-         }
-       },
+    var settings = {
+        facebook: {
+            url: function(url) {
+                return 'https://graph.facebook.com/?id=' + url;
+            },
+            shareCount: function(data) {
+                return data.share.share_count;
+            },
+        },
 
-       twitter: {
-         url: function( url ){
-            return null;
-         },
-         shareCount: function( data ){
-           return null;
-         }
-       },
+        twitter: {
+            url: function(url) {
+                return null;
+            },
+            shareCount: function(data) {
+                return null;
+            },
+        },
 
-       google: {
-         url: function( url ){
-            return null;
-         },
-         shareCount: function( data ){
-           return null;
-         }
-       },
+        google: {
+            url: function(url) {
+                return null;
+            },
+            shareCount: function(data) {
+                return null;
+            },
+        },
 
-       pinterest: {
-         url: function( url ) {
-            return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
-         },
-         shareCount: function( data ){
-            return data.count;
-         }
-       },
+        pinterest: {
+            url: function(url) {
+                return 'https://widgets.pinterest.com/v1/urls/count.json?url=' + url;
+            },
+            shareCount: function(data) {
+                return data.count;
+            },
+        },
 
-       github: {
-         url: function( repo, token ) {
-           return (
-               'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
-           );
-         },
-         shareCount: function( data ){
-           return data.data.stargazers_count;
-         }
-       },
+        github: {
+            url: function(repo, token) {
+                return (
+                    'https://api.github.com/repos' + repo + (typeof token === 'string' ? '?access_token=' + token : '')
+                );
+            },
+            shareCount: function(data) {
+                return data.data.stargazers_count;
+            },
+        },
 
-       storage: {
-         enabled: (function() {
-             // Try to use local storage (it might be disabled,
-             // e.g. user is in private mode)
-             try {
-                 var key = '___test';
-                 window.localStorage.setItem(key, key);
-                 window.localStorage.removeItem(key);
-                 return true;
-             } catch (e) {
-                 return false;
-             }
-         })(),
-       }
-     };
+        storage: {
+            enabled: (function() {
+                // Try to use local storage (it might be disabled,
+                // e.g. user is in private mode)
+                try {
+                    var key = '___test';
+                    window.localStorage.setItem(key, key);
+                    window.localStorage.removeItem(key);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            })(),
+        },
+    };
 
     /**
      * Default Shr Config. All variables, settings and states are stored here
@@ -176,41 +176,41 @@
             format: true,
             position: 'after',
             increment: true,
-            html: function( count, classname, position) {
+            html: function(count, classname, position) {
                 return '<span class="' + classname + ' ' + classname + '--' + position + '">' + count + '</span>';
-            }
+            },
         },
         google: {
-          popup: {
-            width: 500,
-            height: 500
-          }
+            popup: {
+                width: 500,
+                height: 500,
+            },
         },
         facebook: {
-          popup: {
-            width: 640,
-            height: 270,
-          }
+            popup: {
+                width: 640,
+                height: 270,
+            },
         },
         twitter: {
-          popup: {
-            width: 640,
-            height: 240
-          }
+            popup: {
+                width: 640,
+                height: 240,
+            },
         },
         pinterest: {
-          popup: {
-            width: 750,
-            height: 550
-          }
+            popup: {
+                width: 750,
+                height: 550,
+            },
         },
         github: {
-          tokens: {}
+            tokens: {},
         },
         storage: {
-          key: 'shr',
-          ttl: 300000,
-        }
+            key: 'shr',
+            ttl: 300000,
+        },
     };
 
     // Initializes the log method for logging errors when debugging.
@@ -224,7 +224,7 @@
      *
      * @param {string} string - The string being checked for null or empty.
      */
-    function isNullOrEmpty( string ) {
+    function isNullOrEmpty(string) {
         return typeof string === 'undefined' || string === null || !string.length;
     }
 
@@ -234,7 +234,7 @@
      *
      * @param {number} number - The number being formatted.
      */
-    function formatNumber( number ) {
+    function formatNumber(number) {
         // Work out whether decimal separator is . or , for localised numbers
         var decimalSeparator = /\./.test((1.1).toLocaleString()) ? '.' : ',';
 
@@ -253,7 +253,7 @@
      * @param {function} callback   - The callback function for the event.
      * @param {boolean} toggle      - Whether we should add an event listener or remove it.
      */
-    function toggleHandler( element, events, callback, toggle ) {
+    function toggleHandler(element, events, callback, toggle) {
         // Split the events string into a list by spaces.
         var eventList = events.split(' ');
 
@@ -281,9 +281,9 @@
      * @param {string} events     - A string containing all of the events bound to the element
      * @param {function} callback - The callback function for the events bound.
      */
-    function on( element, events, callback ) {
+    function on(element, events, callback) {
         if (element) {
-            toggleHandler( element, events, callback, true );
+            toggleHandler(element, events, callback, true);
         }
     }
 
@@ -297,10 +297,10 @@
      * @param {Object} destination  - After the extend, what will the object become.
      * @param {Object} source       - The object being merged
      */
-    function extend( destination, source ) {
+    function extend(destination, source) {
         // Iterates over all of the properties in the source
         // object to merge with the destination.
-        for ( var property in source ) {
+        for (var property in source) {
             if (source[property] && source[property].constructor && source[property].constructor === Object) {
                 destination[property] = destination[property] || {};
                 extend(destination[property], source[property]);
@@ -319,9 +319,9 @@
      * @param {Event} event   - Event that triggered teh popup window.
      * @param {Object} shr    - The Shr object to grab configurations from.
      */
-    function popup( event, shr ) {
+    function popup(event, shr) {
         // Only popup if we need to...
-        if (! config[shr.network].popup ) {
+        if (!config[shr.network].popup) {
             return;
         }
 
@@ -369,7 +369,7 @@
      * @param {string} query  - The query part of the URL.
      * @param {string} name   - The name of the social network we are getting the share count for.
      */
-    function getParameterByName( query, name ) {
+    function getParameterByName(query, name) {
         name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
 
         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -384,7 +384,7 @@
      * @param {string} url          - The URL of the of the sharing API.
      * @param {function} callback   - The callback funciton once the API completes the request.
      */
-    function getJSONP( url, callback ) {
+    function getJSONP(url, callback) {
         // Generate a random callback
         var name = 'jsonp_callback_' + Math.round(100000 * Math.random());
 
@@ -408,7 +408,7 @@
      */
     function getStorage() {
         // Checks if storage is enabled and has the shr key.
-        if ( config.storage.enabled && config.storage.key in window.localStorage ) {
+        if (config.storage.enabled && config.storage.key in window.localStorage) {
             // Sets the global storage to the data returned from
             // accessing the storage.
             storage = {
@@ -423,7 +423,7 @@
      *
      * @param {Object} data   - The share count data.
      */
-    function setStorage( data ) {
+    function setStorage(data) {
         // Ensures that local storage is enabled.
         if (!config.storage.enabled) {
             return;
@@ -442,28 +442,28 @@
      *
      * @param {Object} shr  - The Shr object.
      */
-    function parseUrl( shr ) {
+    function parseUrl(shr) {
         // Get the url that is being shared based on the network
-        switch ( shr.network ) {
+        switch (shr.network) {
             case 'facebook':
-                return getParameterByName( shr.link.search, 'u' );
-            break;
+                return getParameterByName(shr.link.search, 'u');
+                break;
             case 'github':
                 return shr.link.pathname;
-            break;
+                break;
             case 'twitter':
-                return getParameterByName( shr.link.search, 'url' );
-            break;
+                return getParameterByName(shr.link.search, 'url');
+                break;
             case 'pinterest':
-                return getParameterByName( shr.link.search, 'url' );
-            break;
+                return getParameterByName(shr.link.search, 'url');
+                break;
             case 'google':
-                return getParameterByName( shr.link.search, 'url' );
-            break;
-            
+                return getParameterByName(shr.link.search, 'url');
+                break;
+
             default:
-                return getParameterByName( shr.link.search, 'url' );
-            break;
+                return getParameterByName(shr.link.search, 'url');
+                break;
         }
     }
 
@@ -471,19 +471,19 @@
      * String format an endpoint URL for JSONP
      * @param {Object} shr  - The Shr object.
      */
-    function formatUrl( shr ) {
-        if ( shr.network in config )  {
+    function formatUrl(shr) {
+        if (shr.network in config) {
             // Build the URL for the JSON P based off of network.
-            switch( shr.network ){
-              // GitHub requires a repo for the API call, so we need to build
-              // the URL. We will also need tokens if they were passed in to build
-              // the URL.
-              case 'github':
-                return config[ shr.network ]['url']( shr.url, config.github.tokens );
-              break;
-              default:
-                return config[ shr.network ]['url']( encodeURIComponent( shr.url ) );
-              break;
+            switch (shr.network) {
+                // GitHub requires a repo for the API call, so we need to build
+                // the URL. We will also need tokens if they were passed in to build
+                // the URL.
+                case 'github':
+                    return config[shr.network]['url'](shr.url, config.github.tokens);
+                    break;
+                default:
+                    return config[shr.network]['url'](encodeURIComponent(shr.url));
+                    break;
             }
         }
 
@@ -498,31 +498,27 @@
      * @param {Object} shr          - The Shr object
      * @param {function} callback   - The callback for when the request is completed.
      */
-    function getCount( shr, callback ) {
+    function getCount(shr, callback) {
         // Format the JSONP endpoint
-        var url = formatUrl( shr );
+        var url = formatUrl(shr);
 
         // If there's an endpoint. For some social networks, you can't
         // get the share count (like Twitter) so we won't have any data. The link
         // will be to share it, but you won't get a count of how many people have.
-      
+
         // If there's an endpoint
 
-        if ( !isNullOrEmpty( url ) ) {
+        if (!isNullOrEmpty(url)) {
             // Try from cache first
-            if ( config.storage.enabled ) {
-                var key = parseUrl( shr );
-
+            if (config.storage.enabled) {
+                var key = parseUrl(shr);
 
                 // Get from storage if it exists, the network is in the key
                 // based off of the URL and the ttl is still valid.
 
-                if ( key in storage.data
-                      && shr.network in storage.data[key]
-                      && storage.ttl > Date.now() ) {
-
+                if (key in storage.data && shr.network in storage.data[key] && storage.ttl > Date.now()) {
                     // This will display the count.
-                    callback.call( null, storage.data[key][ shr.network ] );
+                    callback.call(null, storage.data[key][shr.network]);
 
                     return;
                 }
@@ -534,11 +530,11 @@
         // at this point.
 
         // Make the request
-        if ( !isNullOrEmpty( url ) ) {
+        if (!isNullOrEmpty(url)) {
             // Runs a GET JSON P request on the URL.
-            getJSONP( url, function( data ) {
+            getJSONP(url, function(data) {
                 // Cache in local storage (that expires)
-                if ( config.storage.enabled ) {
+                if (config.storage.enabled) {
                     // Create the initial object, if it's null
                     if (!(key in storage.data)) {
                         storage.data[key] = {};
@@ -548,11 +544,11 @@
                     storage.data[key][shr.network] = data;
 
                     // Store the result
-                    setStorage( storage.data );
+                    setStorage(storage.data);
                 }
 
                 // Calls the callback to display the data count.
-                callback.call( null, data );
+                callback.call(null, data);
             });
         }
     }
@@ -562,7 +558,7 @@
      *
      * @param {string} value  - The value we are extracting the integer value from.
      */
-    function parseInt( value ) {
+    function parseInt(value) {
         value = Number(value);
         return !isNaN(value) ? value : 0;
     }
@@ -574,26 +570,15 @@
      * @param {Object} data         - The data returned from the share count API.
      * @param {boolean} increment   - Determines if we should increment the count or not.
      */
-    function displayCount( shr, data, increment ) {
-        // Prefix data
-        // eg. GitHub uses data.data.forks, vs facebooks data.shares
-        data = prefixData(shr.network, data);
-
+    function displayCount(shr, data, increment) {
         var count = 0;
         var custom = shr.link.getAttribute('data-shr-display');
 
-        // Facebook changed the schema of their data
-        switch (shr.network) {
-            case 'facebook':
-                data = data.share;
-                break;
-        }
-
         // Get value based on config
-        if ( !isNullOrEmpty( custom ) ) {
+        if (!isNullOrEmpty(custom)) {
             count = data[custom];
-        } else if ( shr.network in config ) {
-            count = config[ shr.network ].shareCount( data );
+        } else if (shr.network in config) {
+            count = config[shr.network].shareCount(data);
         }
 
         // Parse
@@ -608,7 +593,7 @@
             if (shr.display) {
                 count = parseInt(shr.display.innerText);
             }
-          
+
             count++;
         }
 
@@ -649,10 +634,10 @@
      *
      * @param {element} link   - The element representing the Shr link.
      */
-    function Shr( link ) {
+    function Shr(link) {
         var shr = this;
 
-        if ( typeof link === 'undefined' ) {
+        if (typeof link === 'undefined') {
             error('No share link found.');
             return false;
         }
@@ -661,27 +646,24 @@
         shr.link = link;
 
         // Get the type (this is super important)
-        shr.network = link.getAttribute( config.selector );
+        shr.network = link.getAttribute(config.selector);
 
         // Get the url we're sharing
-        shr.url = parseUrl( shr );
+        shr.url = parseUrl(shr);
 
         // Get the share count
-        getCount( shr, function(data) {
-            displayCount( shr, data );
+        getCount(shr, function(data) {
+            displayCount(shr, data);
         });
 
         // Listen for events
-        on( shr.link, 'click', function(event) {
-            popup( event, shr );
+        on(shr.link, 'click', function(event) {
+            popup(event, shr);
 
             // Refresh the share count
-            getCount(
-                shr,
-                function(data) {
-                  displayCount( shr, data, config.count.increment );
-                }
-            );
+            getCount(shr, function(data) {
+                displayCount(shr, data, config.count.increment);
+            });
         });
 
         // Return the instance
@@ -693,17 +675,17 @@
      *
      * @param {Object} options      - The user defined options to extend to the defaults
      */
-    api.setup = function( options ) {
+    api.setup = function(options) {
         // Extend the config with the options with user specified
-        config = extend( defaults, options );
+        config = extend(defaults, options);
 
         // Include the settings into the config so the user doesn't
         // accidentally overwrite important settings.
-        config = extend( config, settings );
+        config = extend(config, settings);
 
         // Selects all of the elements based on the config and the selector
         // specified.
-        var elements = document.querySelectorAll( '['+config.selector+']' );
+        var elements = document.querySelectorAll('[' + config.selector + ']');
 
         // Gets the storage data from what was already set. This will
         // set the global storage parameter.
@@ -725,9 +707,9 @@
         }
 
         // Debugging
-        if ( config.debug && window.console ) {
-            log = window.console.log.bind( console );
-            error = window.console.error.bind( console );
+        if (config.debug && window.console) {
+            log = window.console.log.bind(console);
+            error = window.console.error.bind(console);
         }
     };
-})(window.shr = window.shr || {});
+})((window.shr = window.shr || {}));
