@@ -1,0 +1,12 @@
+{
+    "cdn": {
+        "bucket": "cdn-shr",
+        "domain": "cdn.shr.one",
+        "region": "us-east-1"
+    },
+    "docs": {
+        "bucket": "shr.one",
+        "domain": "shr.one",
+        "region": "us-east-1"
+    }
+}
