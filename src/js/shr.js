@@ -107,6 +107,24 @@
             },
         },
 
+        youtube_subscribe: {
+            url: function(channel, key) {
+                return (
+                    'https://www.googleapis.com/youtube/v3/channels?part=statistics&forUsername=' +
+                    channel +
+                    '&key=' +
+                    key
+                );
+            },
+            shareCount: function(data) {
+                if (data.error == undefined) {
+                    return data.items[0]['statistics'].subscriberCount;
+                } else {
+                    return null;
+                }
+            },
+        },
+
         storage: {
             enabled: (function() {
                 // Try to use local storage (it might be disabled,
@@ -165,6 +183,10 @@
      * @property {Object}   github                 - The object containing all configuration variables for GitHub.
      * @property {Object}   github.tokens          - The object containing optional authentication tokens for GitHub.
      *
+     * @property {Object}   youtube_subscribe      - The object containing all configuration variables for the Youtube Subscribe button.
+     * @property {String}   youtube_subscribe.channel -The string name of the channel we are getting the subscriber count for.
+     * @property {String}   youtube_subscribe.key  - The public key you need to get the subscriber count.
+     *
      * @property {Object}   storage                - The object containing the settings for local storage.
      * @property {string}   storage.key            - The key that the storage will use to access Shr data.
      * @property {number}   storage.ttl            - The time to live for the local storage values if available.
@@ -208,6 +230,10 @@
         },
         github: {
             tokens: {},
+        },
+        youtube_subscribe: {
+            channel: '',
+            key: '',
         },
         storage: {
             key: 'shr',
@@ -462,7 +488,9 @@
             case 'google':
                 return getParameterByName(shr.link.search, 'url');
                 break;
-
+            case 'youtube_subscribe':
+                return shr.link.pathname;
+                break;
             default:
                 return getParameterByName(shr.link.search, 'url');
                 break;
@@ -482,6 +510,9 @@
                 // the URL.
                 case 'github':
                     return config[shr.network]['url'](shr.url, config.github.tokens);
+                    break;
+                case 'youtube_subscribe':
+                    return config[shr.network]['url'](config.youtube_subscribe.channel, config.youtube_subscribe.key);
                     break;
                 default:
                     return config[shr.network]['url'](encodeURIComponent(shr.url));

@@ -60,6 +60,9 @@
     &-github {
         @include shr-button-styles($shr-button-github-bg-color, darken($shr-button-github-bg-color, 10%));
     }
+    &-youtube {
+        @include shr-button-styles($shr-button-youtube-bg-color);
+    }
 }
 
 // Count bubble
