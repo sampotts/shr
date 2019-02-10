@@ -1,23 +1,18 @@
 {
     "shr": {
-        "less": {
-            "shr.css":     ["src/less/shr.less"]
-        },
         "sass": {
-            "shr-sass.css":["src/sass/shr-sass.scss"]
+            "shr.css": ["src/sass/shr.scss"]
         },
         "js": {
-            "shr.js":      ["src/js/shr.js"]
+            "shr.js": ["src/js/shr.js"]
         }
     },
     "docs": {
         "less": {
-            "docs.css":     ["docs/src/less/docs.less"]
+            "docs.css": ["docs/src/less/docs.less"]
         },
         "js": {
-            "docs.js": [
-                "docs/src/js/docs.js"
-            ]
+            "docs.js": ["docs/src/js/docs.js"]
         }
     }
 }
