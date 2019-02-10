@@ -1,9 +1,4 @@
 {
-    // Exclude from the editor
-    "files.exclude": {
-        "**/node_modules": true
-    },
-
     // Exclude from search
     "search.exclude": {
         "dist/": true
@@ -14,12 +9,8 @@
     "editor.insertSpaces": true,
     "editor.formatOnSave": true,
 
-    // Trim on save
-    "files.trimTrailingWhitespace": true,
-
     // Prettier settings
     "prettier.tabWidth": 4,
     "prettier.eslintIntegration": true,
-    "prettier.printWidth": 120,
-    "prettier.cssEnable": ["css", "less", "scss"]
+    "prettier.printWidth": 120
 }
