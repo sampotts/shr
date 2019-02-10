@@ -35,7 +35,7 @@ class Shr {
         }
 
         if (!is.element(this.elements.link) || !is.empty(this.element.shr)) {
-            throw new Error('No share link found.');
+            return;
         }
 
         this.config = Object.assign({}, defaults, options, { networks: constants });
