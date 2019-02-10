@@ -267,9 +267,9 @@ gulp.task("docs", function() {
         .pipe(s3(aws.cdn, options.docs));
 });
 
-// Open the docs site to check it's sweet
-gulp.task("open", function() {
-    console.log("Opening " + aws.docs.bucket + "...");
+//Open the docs site to check it's sweet
+gulp.task('open', function() {
+    console.log('Opening ' + aws.docs.bucket + '...');
 
     // A file must be specified or gulp will skip the task
     // Doesn't matter which file since we set the URL above
