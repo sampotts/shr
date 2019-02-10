@@ -1,5 +1,5 @@
 /**
- * @name 		Shr.js
+ * @name    Shr.js
  * @version 1.1.1
  * @author 	Sam Potts
  * @license The MIT License (MIT)
@@ -149,6 +149,7 @@
      * @typedef {Object} defaults
      * @type {Object}
      *
+     * @property {boolean}  debug                 - The flag for if we debug Shr or not. By defaul this is false.
      * @property {string}   selector              - The base selector for the share link
 
      * @property {Object}   count                 - The object containing the settings for the count.
@@ -191,6 +192,7 @@
      * @property {number}   storage.ttl            - The time to live for the local storage values if available.
      */
     var defaults = {
+        debug: false,
         selector: 'data-shr-network',
         count: {
             classname: 'share-count',
