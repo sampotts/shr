@@ -2,8 +2,8 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>Shr - Simple, clean, customizable sharing buttons</title>
-        <meta name="description" content="Simple sharing buttons for social networks." />
+        <title>Shr - Simple, clean, and customizable social sharing buttons</title>
+        <meta name="description" content="Simple, clean, and customizable social sharing buttons" />
         <meta name="author" content="Sam Potts" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -13,20 +13,45 @@
         <!-- Docs styles -->
         <link rel="stylesheet" href="dist/docs.css" />
 
+        <!-- Opengraph -->
+        <meta property="og:title" content="Shr - Simple, clean, and customizable social sharing buttons" />
+        <meta property="og:site_name" content="Shr" />
+        <meta property="og:url" content="https://shr.one" />
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@sam_potts" />
+        <meta name="twitter:creator" content="@sam_potts" />
+        <meta name="twitter:card" content="summary_large_image" />
+
         <!-- Preload -->
         <link
             rel="preload"
             as="font"
             crossorigin
             type="font/woff2"
-            href="https://cdn.shr.one/fonts/avenir-medium.woff2"
+            href="https://cdn.plyr.io/static/fonts/gordita-regular.woff2"
         />
         <link
             rel="preload"
             as="font"
             crossorigin
             type="font/woff2"
-            href="https://cdn.shr.one/fonts/avenir-bold.woff2"
+            href="https://cdn.plyr.io/static/fonts/gordita-medium.woff2"
+        />
+        <link
+            rel="preload"
+            as="font"
+            crossorigin
+            type="font/woff2"
+            href="https://cdn.plyr.io/static/fonts/gordita-bold.woff2"
+        />
+        <link
+            rel="preload"
+            as="font"
+            crossorigin
+            type="font/woff2"
+            href="https://cdn.plyr.io/static/fonts/gordita-black.woff2"
         />
     </head>
 
@@ -34,7 +59,7 @@
         <header>
             <h1>Sh<span>a</span>r<span>e</span></h1>
             <p>
-                Simple, clean, customizable sharing buttons by
+                Simple, clean, and customizable social sharing buttons by
                 <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a>
             </p>
         </header>
@@ -118,5 +143,18 @@
 
         <!-- Docs script -->
         <script src="dist/docs.js"></script>
+
+        <!-- Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132699580-2"></script>
+        <script>
+            if (window.location.hostname === "shr.one") {
+                window.dataLayer = window.dataLayer || [];
+                function gtag() {
+                    window.dataLayer.push(arguments);
+                }
+                gtag("js", new Date());
+                gtag("config", "UA-132699580-2");
+            }
+        </script>
     </body>
 </html>
