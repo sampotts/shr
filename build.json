@@ -1,0 +1,34 @@
+{
+    "js": {
+        "shr.js": {
+            "src": "./src/js/shr.js",
+            "dist": "./dist/",
+            "formats": ["es", "umd"]
+        },
+        "docs.js": {
+            "src": "./docs/src/js/docs.js",
+            "dist": "./docs/dist/",
+            "formats": ["iife"]
+        }
+    },
+    "css": {
+        "docs.css": {
+            "src": "./docs/src/less/docs.less",
+            "dist": "./docs/dist/"
+        },
+        "shr.css": {
+            "src": "./src/sass/shr.scss",
+            "dist": "./dist/"
+        }
+    },
+    "sprite": {
+        "shr.svg": {
+            "src": "./src/sprite/*.svg",
+            "dist": "./dist"
+        },
+        "docs.svg": {
+            "src": "./docs/src/sprite/*.svg",
+            "dist": "./docs/dist"
+        }
+    }
+}

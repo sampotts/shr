@@ -4,19 +4,17 @@
 
 // Shared
 .shr-button,
-.share-count {
+.shr-count {
     vertical-align: middle;
     border-radius: $shr-button-border-radius;
-    font-size: $shr-font-size;
-    font-family: $shr-font-family;
     font-weight: $shr-font-weight;
-    @include font-smoothing($shr-font-smoothing);
+    box-shadow: transparentize($color: #000, $amount: 0.1);
 }
 
 .shr-button + .shr-button,
-.share-count--after + .shr-button,
-.shr-button + .share-count--before {
-    margin-left: ceil($shr-padding-base / 4);
+.shr-count--after + .shr-button,
+.shr-button + .shr-count--before {
+    margin-left: ceil($shr-padding-base / 2);
 }
 
 // Buttons
@@ -29,10 +27,16 @@
     color: $shr-button-text-color;
     text-decoration: none;
     user-select: none;
+    border: 0;
 
     // Focus styles are handled in the mixin
     &:focus {
         outline: 0;
+    }
+
+    &:hover,
+    &:focus {
+        border: 0;
     }
 
     // Icons
@@ -66,15 +70,13 @@
 }
 
 // Count bubble
-.share-count {
+.shr-count {
     display: inline-block;
     position: relative;
-
     padding: ($shr-padding-base / 4) ($shr-padding-base / 3);
     background: $shr-button-count-bg;
-    border: $shr-button-border-width solid $shr-button-count-border-color;
     text-align: center;
-    min-width: 20px;
+    min-width: 32px;
     color: $shr-button-count-text-color;
 
     // The arrow
@@ -86,25 +88,23 @@
         top: 50%;
         margin-top: -($shr-button-count-arrow-size / 2);
         background: inherit;
-        border: inherit;
-        border-width: $shr-button-border-width 0 0 $shr-button-border-width;
     }
 }
 
-.share-count--after {
+.shr-count--after {
     margin-left: ($shr-padding-base / 2);
 
     &::before {
-        left: $shr-button-border-width;
+        left: 2px;
         transform: rotate(-45deg) translate(-50%, -50%);
     }
 }
 
-.share-count--before {
+.shr-count--before {
     margin-right: ($shr-padding-base / 2);
 
     &::before {
-        right: $shr-button-border-width;
+        right: 2px;
         transform: rotate(135deg) translate(-50%, -50%);
     }
 }

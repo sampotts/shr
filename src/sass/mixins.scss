@@ -4,15 +4,13 @@
 
 // Button styling
 // ---------------------------------------
-@mixin shr-button-styles($background-color: $shr-button-base-bg-color, $focus-color: fade($background-color, 50%)){
+@mixin shr-button-styles($background-color: $shr-button-base-bg-color, $focus-color: transparentize($background-color, 0.66)){
     background-color: $background-color;
-    border: $shr-button-border-width solid darken($background-color, 10%);
-    border-bottom-color: darken($background-color, 15%);
     @include contrast-text-color($background-color);
 
     &:hover,
     &:focus {
-        border-color: darken($background-color, 15%);
+        background-color: darken($background-color, 3%);
     }
 
     &:focus {
@@ -23,21 +21,9 @@
 // Contrast helpers
 // ---------------------------------------
 @mixin contrast-text-color($background: ""){
-  @if( lightness($background) >= 65% ){
-    color: #333;
-  } @else {
-    color: #fff;
-  }
-}
-
-// Font smoothing
-// ---------------------------------------
-@mixin font-smoothing($mode: $shr-font-smoothing){
-  @if( $mode = on ){
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-  } @else {
-    -moz-osx-font-smoothing: auto;
-    -webkit-font-smoothing: subpixel-antialiased;
-  }
+    @if (lightness($background) >= 65%){
+        color: #333;
+    } @else {
+        color: #fff;
+    }
 }

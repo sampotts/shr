@@ -6,16 +6,21 @@
     display: inline-flex;
     padding: ceil(@padding-base / 1.75) ceil(@padding-base * 1.25);
 
-    .button-styles(@off-white, @gray-lighter);
+    .button-styles(@button-background);
     border-radius: 4px;
     transition: all 0.3s ease;
 
-    color: @gray-dark;
+    color: @button-text-color;
     text-decoration: none;
     .font-size();
     font-weight: 600;
 
     &:focus {
         outline: 0;
+    }
+
+    &:hover,
+    &:focus {
+        border: 0;
     }
 }

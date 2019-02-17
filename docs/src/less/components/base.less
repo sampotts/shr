@@ -26,13 +26,13 @@ html {
 body {
     width: 100%;
     padding: @padding-base;
-    background-image: linear-gradient(#fff, fade(#0093e9, 20%));
-
-    font-family: "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    text-align: center;
+    background: @body-background;
+    font-family: @font-family;
+    .font-size();
     .font-smoothing(on);
-    color: @gray-dark;
+    line-height: @line-height;
+    text-align: center;
+    color: @body-text-color;
 }
 
 // Header

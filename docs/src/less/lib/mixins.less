@@ -28,7 +28,7 @@
 // Use rems for font sizing
 // Leave <body> at 100%/16px
 // ---------------------------------------
-.font-size(@font-size: 16) {
+.font-size(@font-size: @font-size-base) {
     @rem: round((@font-size / 16), 3);
     font-size: (@font-size * 1px);
     font-size: ~"@{rem}rem";
@@ -48,14 +48,13 @@
 // Button styling
 // ---------------------------------------
 .button-styles(@background-color: @shr-button-base-bg-color, @focus-color: fade(@background-color, 50%)) {
-    background-image: linear-gradient(@background-color, darken(@background-color, 4%));
     background-color: @background-color;
-    border: 1px solid darken(@background-color, 10%);
-    border-bottom-color: darken(@background-color, 15%);
+    border: 0;
+    box-shadow: 0 1px 1px fade(#000, 5%);
 
     &:hover,
     &:focus {
-        border-color: darken(@background-color, 20%);
+        background-color: darken(@background-color, 3%);
     }
 
     &:focus {

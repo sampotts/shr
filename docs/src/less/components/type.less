@@ -7,8 +7,13 @@ h1 {
     letter-spacing: -.025em;
     margin: 0 0 (@padding-base / 2);
     line-height: 1.2;
-    .font-smoothing();
     .font-size(64);
+    color: @color-headings;
+
+    span {
+        font-weight: @font-weight-regular;
+        color: lighten(@body-background, 5%);
+    }
 }
 
 // Paragraph and small
@@ -26,12 +31,11 @@ small {
 a {
     text-decoration: none;
     color: @link-color;
-    border-bottom: 1px dotted;
     transition: all 0.3s ease;
 
     &:hover,
     &:focus {
-        border-bottom-style: solid;
+        border-bottom: 1px solid;
     }
 
     &:focus {
