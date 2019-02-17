@@ -40,8 +40,8 @@ To set up Shr, you first must include the Shr CSS and JS along with the sprite t
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.shr.one/1.1.1/shr.css" />
-<script src="https://cdn.shr.one/1.1.1/shr.js"></script>
+<link rel="stylesheet" href="https://shr.one/2.0.0-beta.1/shr.css" />
+<script src="https://shr.one/2.0.0-beta.1/shr.js"></script>
 ```
 
 ### Include Your Own Files

@@ -207,10 +207,9 @@ class Shr {
     /**
      * Get the count for the url from API
      *
-     * @param {Object} shr          - The Shr object
-     * @param {function} callback   - The callback for when the request is completed.
+     * @param {Boolean} useCache        Whether to use the local storage cache or not
      */
-    getCount() {
+    getCount(useCache = true) {
         return new Promise((resolve, reject) => {
             // Format the JSONP endpoint
             const url = this.apiUrl;
@@ -225,12 +224,14 @@ class Shr {
             }
 
             // Check cache first
-            const cached = this.storage.get(this.target);
+            if (useCache) {
+                const cached = this.storage.get(this.target);
 
-            if (!is.empty(cached) && Object.keys(cached).includes(this.network)) {
-                resolve(cached[this.network]);
-                this.console.log('getCount resolved from cache.');
-                return;
+                if (!is.empty(cached) && Object.keys(cached).includes(this.network)) {
+                    resolve(cached[this.network]);
+                    this.console.log('getCount resolved from cache.');
+                    return;
+                }
             }
 
             // When we get here, this means the cached counts are not valid,
