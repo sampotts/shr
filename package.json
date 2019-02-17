@@ -1,6 +1,6 @@
 {
     "name": "shr",
-    "version": "1.1.1",
+    "version": "2.0.0-beta.1",
     "description": "Simple, customizable sharing buttons",
     "homepage": "http://shr.one",
     "main": "dist/shr.js",
