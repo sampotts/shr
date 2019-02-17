@@ -32,7 +32,7 @@
 
     <body>
         <header>
-            <h1>Shr</h1>
+            <h1>Sh<span>a</span>r<span>e</span></h1>
             <p>
                 Simple, clean, customizable sharing buttons by
                 <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a>
@@ -53,7 +53,6 @@
                     href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fshr.one"
                     target="_blank"
                     class="shr-button shr-button-facebook js-shr-button"
-                    data-shr-network="facebook"
                 >
                     <svg><use xlink:href="#shr-facebook"></use></svg>Share
                 </a>
@@ -62,7 +61,6 @@
                     href="https://twitter.com/intent/tweet?text=Simple+sharing+buttons+for+social+networks.&amp;url=https%3A%2F%2Fshr.one&amp;via=sam_potts"
                     target="_blank"
                     class="shr-button shr-button-twitter js-shr-button"
-                    data-shr-network="twitter"
                 >
                     <svg><use xlink:href="#shr-twitter"></use></svg>Tweet
                 </a>
@@ -71,16 +69,14 @@
                     href="http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fshr.one&amp;media=http%3A%2F%2Fplacehold.it%2F500x500&amp;description=Simple+sharing+buttons+for+social+networks."
                     target="_blank"
                     class="shr-button shr-button-pinterest js-shr-button"
-                    data-shr-network="pinterest"
                 >
                     <svg><use xlink:href="#shr-pinterest"></use></svg>Pin it
                 </a>
 
                 <a
-                    href="https://www.youtube.com/user/serversideupnet?sub_confirmation=1"
+                    href="https://www.youtube.com/channel/UCFUBt5_cGJpt58XBIh4RtNA?sub_confirmation=1"
                     target="_blank"
                     class="shr-button shr-button-youtube js-shr-button"
-                    data-shr-network="youtube_subscribe"
                 >
                     <svg><use xlink:href="#shr-youtube"></use></svg>Subscribe
                 </a>
@@ -119,9 +115,6 @@
                 };
             })(document, "../dist/sprite.svg");
         </script>
-
-        <!-- Shr core script -->
-        <script src="../dist/shr.js"></script>
 
         <!-- Docs script -->
         <script src="dist/docs.js"></script>

@@ -12,6 +12,7 @@ import Console from './utils/console';
 import { matches } from './utils/css';
 import is from './utils/is';
 import { formatNumber } from './utils/numbers';
+import { extend } from './utils/objects';
 import Storage from './utils/storage';
 import { getDomain } from './utils/urls';
 
@@ -39,7 +40,7 @@ class Shr {
             return;
         }
 
-        this.config = Object.assign({}, defaults, options, { networks: constants });
+        this.config = extend({}, defaults, options, { networks: constants });
 
         this.init();
     }
@@ -50,12 +51,22 @@ class Shr {
         this.storage = new Storage(this.config.storage.key, this.config.storage.ttl, this.config.storage.enabled);
 
         this.getCount()
-            .then(data => this.displayCount(data))
+            .then(data => this.updateDisplay(data))
             .catch(() => {});
 
-        // TODO: Listeners for click etc
+        this.listeners(true);
 
         this.elements.trigger.shr = this;
+    }
+
+    destroy() {
+        this.listeners(false);
+    }
+
+    listeners(toggle = false) {
+        const method = toggle ? 'addEventListener' : 'removeEventListener';
+
+        this.elements.trigger[method]('click', event => this.share(event), false);
     }
 
     get href() {
@@ -90,26 +101,25 @@ class Shr {
     /**
      * Parse the URL we are geting the share count for
      */
-    get url() {
+    get target() {
         if (is.empty(this.network)) {
             return null;
         }
 
-        const getParameter = name => {
-            const url = new URL(this.href);
-            return url.searchParams.get(name);
-        };
+        const url = new URL(this.href);
 
         switch (this.network) {
             case 'facebook':
-                return getParameter('u');
+                return url.searchParams.get('u');
 
             case 'github':
-            case 'youtube_subscribe':
-                return this.href.pathname;
+                return url.pathname.substring(1);
+
+            case 'youtube':
+                return url.pathname.split('/').pop();
 
             default:
-                return getParameter('url');
+                return url.searchParams.get('url');
         }
     }
 
@@ -121,20 +131,26 @@ class Shr {
             return null;
         }
 
-        // Build the URL for the JSON P based off of network.
-        switch (this.network) {
-            // GitHub requires a repo for the API call, so we need to build
-            // the URL. We will also need tokens if they were passed in to build
-            // the URL.
-            case 'github':
-                return this.networkConfig.url(this.href, this.networkConfig.tokens);
+        const { tokens } = this.config;
 
-            case 'youtube_subscribe':
-                return this.networkConfig.url(this.networkConfig.channel, this.networkConfig.key);
+        switch (this.network) {
+            case 'github':
+                return this.networkConfig.url(this.target, tokens.github);
+
+            case 'youtube':
+                return this.networkConfig.url(this.target, tokens.youtube);
 
             default:
-                return this.networkConfig.url(encodeURIComponent(this.href));
+                return this.networkConfig.url(encodeURIComponent(this.target));
         }
+    }
+
+    share(event) {
+        this.openPopup(event);
+
+        this.getCount()
+            .then(data => this.updateDisplay(data, this.config.increment))
+            .catch(() => {});
     }
 
     /**
@@ -142,7 +158,7 @@ class Shr {
      *
      * @param {Event} event   - Event that triggered the popup window.
      */
-    share(event) {
+    openPopup(event) {
         if (!is.event(event)) {
             return;
         }
@@ -163,6 +179,8 @@ class Shr {
         // If window already exists, just focus it
         if (window[name] && !window[name].closed) {
             window[name].focus();
+
+            this.console.log('Popup re-focused.');
         } else {
             // Get position
             const left = window.screenLeft !== undefined ? window.screenLeft : window.screen.left;
@@ -177,6 +195,8 @@ class Shr {
 
             // Focus new window
             window[name].focus();
+
+            this.console.log('Popup opened.');
         }
 
         // Nullify opener to prevent "tab nabbing"
@@ -205,11 +225,11 @@ class Shr {
             }
 
             // Check cache first
-            const key = this.url;
-            const cached = this.storage.get(key);
+            const cached = this.storage.get(this.target);
 
-            if (!is.empty(cached)) {
-                resolve(cached);
+            if (!is.empty(cached) && Object.keys(cached).includes(this.network)) {
+                resolve(cached[this.network]);
+                this.console.log('getCount resolved from cache.');
                 return;
             }
 
@@ -220,12 +240,32 @@ class Shr {
             // Runs a GET request on the URL
             getJSONP(url)
                 .then(data => {
+                    let count = 0;
+                    const custom = this.elements.trigger.getAttribute('data-shr-display');
+
+                    // Get value based on config
+                    if (!is.empty(custom)) {
+                        count = data[custom];
+                    } else {
+                        count = this.networkConfig.shareCount(data);
+                    }
+
+                    // Default to zero for undefined
+                    if (is.empty(count)) {
+                        count = 0;
+                    }
+
+                    // Parse
+                    count = parseInt(count, 10);
+
                     // Cache in local storage
                     this.storage.set({
-                        [key]: data,
+                        [this.target]: {
+                            [this.network]: count,
+                        },
                     });
 
-                    resolve(data);
+                    resolve(count);
                 })
                 .catch(reject);
         });
@@ -234,40 +274,12 @@ class Shr {
     /**
      * Display the count
      *
-     * @param {Object} data         - The data returned from the share count API
-     * @param {boolean} increment   - Determines if we should increment the count or not
+     * @param {Number} input         - The count returned from the share count API
+     * @param {Boolean} increment   -  Determines if we should increment the count or not
      */
-    displayCount(data, increment = false) {
-        let count = 0;
-        const custom = this.elements.trigger.getAttribute('data-shr-display');
-
-        // Get value based on config
-        if (!is.empty(custom)) {
-            count = data[custom];
-        } else {
-            count = this.networkConfig.shareCount(data);
-        }
-
-        // Default to zero for undefined
-        if (is.empty(count)) {
-            count = 0;
-        }
-
-        // Parse
-        count = parseInt(count, 10);
-
+    updateDisplay(input, increment = false) {
         // If we're incrementing (e.g. on click)
-        if (increment) {
-            // Increment the current value if we have it
-            if (is.element(this.elements.count)) {
-                count = parseInt(this.elements.count.innerText, 10);
-            }
-
-            count += 1;
-        }
-
-        // Store count
-        this.count = count;
+        const count = increment ? input + 1 : input;
 
         // Standardize position
         const position = this.config.count.position.toLowerCase();

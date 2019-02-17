@@ -46,7 +46,7 @@ class Storage {
         // Check TTL
         const ttl = window.localStorage.getItem(`${this.key}_ttl`);
 
-        if (is.empty(ttl) || ttl > Date.now()) {
+        if (is.empty(ttl) || ttl < Date.now()) {
             return null;
         }
 
