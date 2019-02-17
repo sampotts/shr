@@ -52,8 +52,8 @@
 const defaults = {
     debug: false,
     count: {
-        classname: 'share-count',
-        displayZero: false,
+        classname: 'shr-count',
+        displayZero: true,
         format: true,
         position: 'after',
         increment: true,

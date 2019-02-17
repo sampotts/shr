@@ -2,9 +2,9 @@
 // Docs example
 // ==========================================================================
 
-import Shr from '../../src/js/shr';
+import Shr from '../../../src/js/shr';
 
-Shr.setup('.js-shr-link', {
+Shr.setup('.js-shr-button', {
     debug: true,
 });
 

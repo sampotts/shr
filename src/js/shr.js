@@ -12,6 +12,7 @@ import Console from './utils/console';
 import { matches } from './utils/css';
 import is from './utils/is';
 import { formatNumber } from './utils/numbers';
+import Storage from './utils/storage';
 import { getDomain } from './utils/urls';
 
 class Shr {
@@ -23,18 +24,18 @@ class Shr {
     constructor(target, options) {
         this.elements = {
             count: null,
-            link: null,
+            trigger: null,
         };
 
         if (is.element(target)) {
             // An Element is passed, use it directly
-            this.elements.link = target;
+            this.elements.trigger = target;
         } else if (is.string(target)) {
             // A CSS Selector is passed, fetch it from the DOM
-            this.elements.link = document.querySelector(target);
+            this.elements.trigger = document.querySelector(target);
         }
 
-        if (!is.element(this.elements.link) || !is.empty(this.element.shr)) {
+        if (!is.element(this.elements.trigger) || !is.empty(this.elements.trigger.shr)) {
             return;
         }
 
@@ -47,21 +48,29 @@ class Shr {
         this.console = new Console(this.config.debug);
 
         this.storage = new Storage(this.config.storage.key, this.config.storage.ttl, this.config.storage.enabled);
+
+        this.getCount()
+            .then(data => this.displayCount(data))
+            .catch(() => {});
+
+        // TODO: Listeners for click etc
+
+        this.elements.trigger.shr = this;
     }
 
     get href() {
-        if (!is.element(this.elements.link)) {
+        if (!is.element(this.elements.trigger)) {
             return null;
         }
 
-        return this.elements.link.href;
+        return this.elements.trigger.href;
     }
 
     /**
      * Get the network for this instance
      */
     get network() {
-        if (!is.element(this.elements.link)) {
+        if (!is.element(this.elements.trigger)) {
             return null;
         }
 
@@ -75,7 +84,7 @@ class Shr {
             return null;
         }
 
-        return this.config[this.network];
+        return this.config.networks[this.network];
     }
 
     /**
@@ -118,7 +127,7 @@ class Shr {
             // the URL. We will also need tokens if they were passed in to build
             // the URL.
             case 'github':
-                return this.networkConfig.url(this.href, this.config.github.tokens);
+                return this.networkConfig.url(this.href, this.networkConfig.tokens);
 
             case 'youtube_subscribe':
                 return this.networkConfig.url(this.networkConfig.channel, this.networkConfig.key);
@@ -191,7 +200,7 @@ class Shr {
             // will be to share it, but you won't get a count of how many people have.
 
             if (is.empty(url)) {
-                reject(new Error('URL is required.'));
+                reject(new Error(`No URL available for ${this.network}.`));
                 return;
             }
 
@@ -228,15 +237,20 @@ class Shr {
      * @param {Object} data         - The data returned from the share count API
      * @param {boolean} increment   - Determines if we should increment the count or not
      */
-    displayCount(data, increment) {
+    displayCount(data, increment = false) {
         let count = 0;
-        const custom = this.element.getAttribute('data-shr-display');
+        const custom = this.elements.trigger.getAttribute('data-shr-display');
 
         // Get value based on config
         if (!is.empty(custom)) {
             count = data[custom];
         } else {
             count = this.networkConfig.shareCount(data);
+        }
+
+        // Default to zero for undefined
+        if (is.empty(count)) {
+            count = 0;
         }
 
         // Parse
@@ -277,13 +291,13 @@ class Shr {
                 this.elements.count.textContent = label;
             } else {
                 // Insert count display
-                this.elements.link.insertAdjacentHTML(
+                this.elements.trigger.insertAdjacentHTML(
                     isAfter ? 'afterend' : 'beforebegin',
                     this.config.count.html(label, this.config.count.classname, position)
                 );
 
                 // Store reference
-                this.elements.count = this.elements.link[isAfter ? 'nextSibling' : 'previousSibling'];
+                this.elements.count = this.elements.trigger[isAfter ? 'nextSibling' : 'previousSibling'];
             }
         }
     }

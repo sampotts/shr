@@ -4,7 +4,7 @@
 
 // Shared
 .shr-button,
-.share-count {
+.shr-count {
     vertical-align: middle;
     border-radius: $shr-button-border-radius;
     font-size: $shr-font-size;
@@ -14,8 +14,8 @@
 }
 
 .shr-button + .shr-button,
-.share-count--after + .shr-button,
-.shr-button + .share-count--before {
+.shr-count--after + .shr-button,
+.shr-button + .shr-count--before {
     margin-left: ceil($shr-padding-base / 4);
 }
 
@@ -66,7 +66,7 @@
 }
 
 // Count bubble
-.share-count {
+.shr-count {
     display: inline-block;
     position: relative;
 
@@ -74,7 +74,7 @@
     background: $shr-button-count-bg;
     border: $shr-button-border-width solid $shr-button-count-border-color;
     text-align: center;
-    min-width: 20px;
+    min-width: 32px;
     color: $shr-button-count-text-color;
 
     // The arrow
@@ -91,7 +91,7 @@
     }
 }
 
-.share-count--after {
+.shr-count--after {
     margin-left: ($shr-padding-base / 2);
 
     &::before {
@@ -100,7 +100,7 @@
     }
 }
 
-.share-count--before {
+.shr-count--before {
     margin-right: ($shr-padding-base / 2);
 
     &::before {

@@ -2,33 +2,59 @@
 // Gulp build script
 // ==========================================================================
 
-const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
-const concat = require('gulp-concat');
-const terser = require('gulp-terser');
+
+// CSS
+const less = require('gulp-less');
 const sass = require('gulp-sass');
 const clean = require('gulp-clean-css');
-const run = require('run-sequence');
 const prefix = require('gulp-autoprefixer');
+
+// JavaScript
+const terser = require('gulp-terser');
+const rollup = require('gulp-better-rollup');
+const babel = require('rollup-plugin-babel');
+const commonjs = require('rollup-plugin-commonjs');
+const resolve = require('rollup-plugin-node-resolve');
+const sourcemaps = require('gulp-sourcemaps');
+
+// Images
 const svgstore = require('gulp-svgstore');
-const svgmin = require('gulp-svgmin');
+const imagemin = require('gulp-imagemin');
+
+// Utils
+const plumber = require('gulp-plumber');
 const rename = require('gulp-rename');
-
 const replace = require('gulp-replace');
-const open = require('gulp-open');
 const size = require('gulp-size');
+const log = require('fancy-log');
 
+// Deployment
 const aws = require('aws-sdk');
+const publish = require('gulp-awspublish');
 
-const bundles = require('./package.json');
-const deploy = require('./deploy.json');
 const pkg = require('./package.json');
+const build = require('./build.json');
+const deploy = require('./deploy.json');
 
-const { version, browserlist } = pkg;
+const { browserslist, version } = pkg;
 
-var root = __dirname;
-var paths = {
+// Get AWS config
+Object.values(deploy).forEach(target => {
+    Object.assign(target, {
+        publisher: publish.create({
+            region: target.region,
+            params: {
+                Bucket: target.bucket,
+            },
+            credentials: new aws.SharedIniFileCredentials({ profile: 'shr' }),
+        }),
+    });
+});
+
+const root = __dirname;
+const paths = {
     shr: {
         // Source paths
         src: {
@@ -36,17 +62,16 @@ var paths = {
             js: path.join(root, 'src/js/**/*'),
             sprite: path.join(root, 'src/sprite/*.svg'),
         },
-        // Output paths
-        output: path.join(root, 'dist/'),
     },
     docs: {
         // Source paths
         src: {
             less: path.join(root, 'docs/src/less/**/*'),
             js: path.join(root, 'docs/src/js/**/*'),
+            sprite: path.join(root, 'docs/src/sprite/**/*'),
         },
         // Output paths
-        output: path.join(root, 'docs/dist/'),
+        dist: path.join(root, 'docs/dist/'),
         // Docs
         root: path.join(root, 'docs/'),
     },
@@ -54,170 +79,150 @@ var paths = {
 };
 
 // Task arrays
-var tasks = {
-    less: [],
-    sass: [],
+const tasks = {
+    css: [],
     js: [],
+    sprite: [],
 };
 
-var build = {
-    js: function(files, bundle) {
-        for (var key in files) {
-            (function(key) {
-                var name = 'js-' + key;
-                tasks.js.push(name);
+// Babel config
+const babelrc = {
+    babelrc: false,
+    presets: [
+        '@babel/env',
+        [
+            'minify',
+            {
+                builtIns: false, // Temporary fix for https://github.com/babel/minify/issues/904
+            },
+        ],
+    ],
+};
 
-                gulp.task(name, function() {
-                    return gulp
-                        .src(bundles[bundle].js[key])
-                        .pipe(concat(key))
-                        .pipe(uglify())
-                        .pipe(gulp.dest(paths[bundle].output));
-                });
-            })(key);
-        }
-    },
-    less: function(files, bundle) {
-        for (var key in files) {
-            (function(key) {
-                var name = 'less-' + key;
-                tasks.less.push(name);
+// Size plugin
+const sizeOptions = { showFiles: true, gzip: true };
 
-                gulp.task(name, function() {
-                    return gulp
-                        .src(bundles[bundle].less[key])
-                        .pipe(less())
-                        .on('error', gutil.log)
-                        .pipe(concat(key))
-                        .pipe(
-                            prefix(['last 2 versions'], {
-                                cascade: true,
-                            })
-                        )
-                        .pipe(minify())
-                        .pipe(gulp.dest(paths[bundle].output));
-                });
-            })(key);
-        }
-    },
-    sass: function(files, bundle) {
-        for (var key in files) {
-            (function(key) {
-                var name = 'sass-' + key;
-                tasks.sass.push(name);
+// JavaScript
+const namespace = 'Shr';
 
-                gulp.task(name, function() {
-                    return gulp
-                        .src(bundles[bundle].sass[key])
-                        .pipe(sass())
-                        .on('error', gutil.log)
-                        .pipe(concat(key))
-                        .pipe(
-                            prefix(['last 2 versions'], {
-                                cascade: true,
-                            })
-                        )
-                        .pipe(minify())
-                        .pipe(gulp.dest(paths[bundle].output));
-                });
-            })(key);
-        }
-    },
-    sprite: function() {
-        // Process Icons
-        gulp.task('sprite', function() {
+Object.entries(build.js).forEach(([filename, entry]) => {
+    entry.formats.forEach(format => {
+        const name = `js:${filename}:${format}`;
+        tasks.js.push(name);
+
+        gulp.task(name, () => {
             return gulp
-                .src(paths.shr.src.sprite)
+                .src(entry.src)
+                .pipe(plumber())
+                .pipe(sourcemaps.init())
                 .pipe(
-                    svgmin({
-                        plugins: [
-                            {
-                                removeDesc: true,
-                            },
-                        ],
+                    rollup(
+                        {
+                            plugins: [resolve(), commonjs(), babel(babelrc)],
+                        },
+                        {
+                            name: namespace,
+                            // exports: 'named',
+                            format,
+                        }
+                    )
+                )
+                .pipe(terser())
+                .pipe(
+                    rename({
+                        extname: `.${format === 'es' ? 'mjs' : 'js'}`,
                     })
                 )
-                .pipe(svgstore())
-                .pipe(gulp.dest(paths.shr.output));
+                .pipe(size(sizeOptions))
+                .pipe(gulp.dest(entry.dist));
         });
-    },
-};
-
-// Core files
-build.js(bundles.shr.js, 'shr');
-build.sass(bundles.shr.sass, 'shr');
-build.sprite();
-
-// Docs files
-build.less(bundles.docs.less, 'docs');
-build.js(bundles.docs.js, 'docs');
-
-// Build all JS (inc. templates)
-gulp.task('js', function() {
-    run(tasks.js);
+    });
 });
 
-// Build SASS (for testing, default is LESS)
-gulp.task('sass', function() {
-    run(tasks.sass);
+// CSS
+Object.entries(build.css).forEach(([filename, entry]) => {
+    const name = `css:${filename}`;
+    tasks.css.push(name);
+
+    gulp.task(name, () => {
+        return gulp
+            .src(entry.src)
+            .pipe(path.extname(entry.src) === '.less' ? less() : sass())
+            .pipe(
+                prefix(browserslist, {
+                    cascade: false,
+                })
+            )
+            .pipe(clean())
+            .pipe(size(sizeOptions))
+            .pipe(gulp.dest(entry.dist));
+    });
+});
+
+// SVG Sprite
+Object.entries(build.sprite).forEach(([filename, entry]) => {
+    const name = `sprite:${filename}`;
+    tasks.sprite.push(name);
+
+    gulp.task(name, () => {
+        return gulp
+            .src(entry.src)
+            .pipe(imagemin())
+            .pipe(svgstore())
+            .pipe(rename({ basename: path.basename(filename) }))
+            .pipe(size(sizeOptions))
+            .pipe(gulp.dest(entry.dist));
+    });
 });
 
 // Watch for file changes
-gulp.task('watch', function() {
+gulp.task('watch', () => {
     // Core
-    gulp.watch(paths.shr.src.js, tasks.js);
-    gulp.watch(paths.shr.src.less, tasks.less);
-    gulp.watch(paths.shr.src.sass, tasks.sass);
-    gulp.watch(paths.shr.src.sprite, ['sprite']);
+    gulp.watch(paths.shr.src.js, gulp.parallel(...tasks.js));
+    gulp.watch(paths.shr.src.sass, gulp.parallel(...tasks.css));
+    gulp.watch(paths.shr.src.sprite, gulp.parallel(...tasks.sprite));
 
     // Docs
-    gulp.watch(paths.docs.src.js, tasks.js);
-    gulp.watch(paths.docs.src.less, tasks.less);
+    gulp.watch(paths.docs.src.js, gulp.parallel(...tasks.js));
+    gulp.watch(paths.docs.src.less, gulp.parallel(...tasks.css));
 });
 
 // Default gulp task
-gulp.task('default', function() {
-    run(tasks.js, tasks.less, tasks.sass, 'sprite', 'watch');
-});
+gulp.task('default', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite, 'watch'));
 
 // Publish a version to CDN and docs
 // --------------------------------------------
 
-//Some options
-var aws = loadJSON(path.join(root, 'aws.json'));
-var version = package.version;
-var maxAge = 31536000; // seconds 1 year
-var options = {
+// Some options
+const maxAge = 31536000; // seconds 1 year
+const headers = {
     cdn: {
-        headers: {
-            'Cache-Control': 'max-age=' + maxAge,
-            Vary: 'Accept-Encoding',
-        },
-        gzippedOnly: true,
+        'Cache-Control': `max-age=${maxAge}`,
     },
     docs: {
-        headers: {
-            'Cache-Control': 'public, must-revalidate, proxy-revalidate, max-age=0',
-            Vary: 'Accept-Encoding',
-        },
-        gzippedOnly: true,
+        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
     },
 };
 
-// If aws is setup
-if ('cdn' in aws) {
-    var regex = '(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)';
-    var cdnpath = new RegExp(aws.cdn.domain + '/' + regex, 'gi');
-    var semver = new RegExp('shr v' + regex, 'gi');
-    var localpath = new RegExp('(../)?dist', 'gi');
-}
+const regex =
+    '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
+const semver = new RegExp(`v${regex}`, 'gi');
+const cdnpath = new RegExp(`${deploy.cdn.domain}/${regex}`, 'gi');
+const localpath = new RegExp('(../)?dist', 'gi');
 
 // Publish version to CDN bucket
-gulp.task('cdn', function() {
-    console.log('Uploading ' + version + ' to ' + aws.cdn.bucket);
+gulp.task('cdn', () => {
+    const { bucket, publisher } = deploy.cdn;
+
+    if (!publisher) {
+        throw new Error('No publisher instance. Check AWS configuration.');
+    }
+
+    log(`Uploading ${version} to ${bucket}`);
 
     // Upload to CDN
-    gulp.src(paths.upload)
+    return gulp
+        .src(paths.upload)
         .pipe(
             size({
                 showFiles: true,
@@ -225,57 +230,87 @@ gulp.task('cdn', function() {
             })
         )
         .pipe(
-            rename(function(path) {
+            rename(path => {
                 path.dirname = path.dirname.replace('.', version);
             })
         )
-        .pipe(gzip())
-        .pipe(s3(aws.cdn, options.cdn));
+        .pipe(publisher.publish(headers.cdn))
+        .pipe(publish.reporter());
 });
 
-//Publish to Docs bucket
-gulp.task('docs', function() {
-    console.log('Uploading ' + version + ' docs to ' + aws.docs.bucket);
+// Replace versioned files in readme.md
+gulp.task('docs:readme', () => {
+    const { domain } = deploy.docs;
 
-    // Replace versioned files in readme.md
-    gulp.src([root + '/readme.md'])
-        .pipe(replace(cdnpath, aws.cdn.domain + '/' + version))
+    return gulp
+        .src([`${root}/readme.md`])
+        .pipe(replace(cdnpath, `${domain}/${version}`))
         .pipe(gulp.dest(root));
-
-    // Replace versioned files in *.html
-    // e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
-    gulp.src([paths.docs.root + '*.html'])
-        .pipe(replace(localpath, 'https://' + aws.cdn.domain + '/' + version))
-        .pipe(gzip())
-        .pipe(s3(aws.docs, options.docs));
-
-    // Replace versioned files in shr.js
-    gulp.src(path.join(root, 'src/js/shr.js'))
-        .pipe(replace(semver, 'v' + version))
-        .pipe(gulp.dest(path.join(root, 'src/js/')));
-
-    // Upload error.html to cdn using docs options
-    gulp.src([paths.docs.root + 'error.html'])
-        .pipe(replace(localpath, 'https://' + aws.cdn.domain + '/' + version))
-        .pipe(gzip())
-        .pipe(s3(aws.cdn, options.docs));
 });
 
-//Open the docs site to check it's sweet
-gulp.task('open', function() {
-    console.log('Opening ' + aws.docs.bucket + '...');
+// Replace versions in shr.js
+gulp.task('docs:src', () =>
+    gulp
+        .src(path.join(root, 'src/js/shr.js'))
+        .pipe(replace(semver, `v${version}`))
+        .pipe(gulp.dest(path.join(root, 'src/js/')))
+);
 
-    // A file must be specified or gulp will skip the task
-    // Doesn't matter which file since we set the URL above
-    // Weird, I know...
-    gulp.src([paths.docs.root + 'index.html']).pipe(
-        open('', {
-            url: 'http://' + aws.docs.bucket,
-        })
-    );
+// Replace versions in shr.js
+gulp.task('docs:svg', () => {
+    const { domain, publisher } = deploy.cdn;
+
+    if (!publisher) {
+        throw new Error('No publisher instance. Check AWS configuration.');
+    }
+
+    return gulp
+        .src(path.join(root, 'docs/dist/docs.js'))
+        .pipe(replace(localpath, `https://${domain}/${version}`))
+        .pipe(
+            rename(path => {
+                path.dirname = path.dirname.replace('.', version);
+            })
+        )
+        .pipe(publisher.publish(headers.cdn))
+        .pipe(publish.reporter());
 });
+
+// Replace local file paths with remote paths in docs
+// e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
+gulp.task('docs:paths', () => {
+    const { publisher } = deploy.docs;
+    const { domain } = deploy.cdn;
+
+    if (!publisher) {
+        throw new Error('No publisher instance. Check AWS configuration.');
+    }
+
+    return gulp
+        .src([`${paths.docs.root}*.html`])
+        .pipe(replace(localpath, `https://${domain}/${version}`))
+        .pipe(publisher.publish(headers.docs))
+        .pipe(publish.reporter());
+});
+
+// Upload error.html to cdn (as well as docs site)
+gulp.task('docs:error', () => {
+    const { publisher } = deploy.docs;
+    const { domain } = deploy.cdn;
+
+    if (!publisher) {
+        throw new Error('No publisher instance. Check AWS configuration.');
+    }
+
+    return gulp
+        .src([`${paths.docs.root}error.html`])
+        .pipe(replace(localpath, `https://${domain}/${version}`))
+        .pipe(publisher.publish(headers.docs))
+        .pipe(publish.reporter());
+});
+
+// Publish to Docs bucket
+gulp.task('docs', gulp.parallel('docs:readme', 'docs:src', 'docs:svg', 'docs:paths', 'docs:error'));
 
 // Do everything
-gulp.task('publish', function() {
-    run(tasks.js, tasks.less, tasks.sass, 'sprite', 'cdn', 'docs');
-});
+gulp.task('deploy', gulp.series(gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'cdn', 'docs'));
