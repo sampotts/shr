@@ -4,16 +4,6 @@
 
 import is from './is';
 
-// Clone nested objects
-export function cloneDeep(object) {
-    return JSON.parse(JSON.stringify(object));
-}
-
-// Get a nested value in an object
-export function getDeep(object, path) {
-    return path.split('.').reduce((obj, key) => obj && obj[key], object);
-}
-
 // Deep extend destination object with N more objects
 export function extend(target = {}, ...sources) {
     if (!sources.length) {
@@ -40,3 +30,5 @@ export function extend(target = {}, ...sources) {
 
     return extend(target, ...sources);
 }
+
+export default {};
