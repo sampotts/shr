@@ -37,11 +37,9 @@
      * @property {Number}   pinterest.popup.width  - The width of the Pinterest Popup window.
      * @property {Number}   pinterest.popup.height - The height of the Pinterest Popup window.
      *
-     * @property {Object}   github                 - The object containing all configuration variables for GitHub.
-     * @property {Object}   github.token             The optional authentication tokens for GitHub.
-     *
-     * @property {Object}   youtube                - The object containing all configuration variables for the YouTube Subscribe button.
-     * @property {String}   youtube.key  -           The public key you need to get the subscriber count.
+     * @property {Object}   tokens                 - The object containing authentication tokens.
+     * @property {Object}   tokens.github            The optional authentication tokens for GitHub (to prevent rate limiting).
+     * @property {String}   tokens.youtube           The public key you need to get the subscriber count for YouTube.
      *
      * @property {Object}   storage                - The object containing the settings for local storage.
  *     @property {Boolean}  storage.enabled       -  Determines if local storage is enabled for the browser or not.
