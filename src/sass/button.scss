@@ -14,7 +14,7 @@
 .shr-button + .shr-button,
 .shr-count--after + .shr-button,
 .shr-button + .shr-count--before {
-    margin-left: ceil($shr-padding-base / 4);
+    margin-left: ceil($shr-padding-base / 2);
 }
 
 // Buttons
