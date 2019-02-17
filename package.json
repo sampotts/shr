@@ -3,7 +3,12 @@
     "version": "1.1.1",
     "description": "Simple, customizable sharing buttons",
     "homepage": "http://shr.one",
-    "main": "gulpfile.js",
+    "main": "dist/shr.js",
+    "module": "dist/shr.mjs",
+    "jsnext:main": "dist/shr.mjs",
+    "browser": "dist/shr.js",
+    "sass": "src/sass/shr.scss",
+    "style": "dist/shr.css",
     "dependencies": {},
     "devDependencies": {
         "aws-sdk": "^2.404.0",
