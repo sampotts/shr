@@ -51,8 +51,8 @@ const constants = {
         url: url => `https://widgets.pinterest.com/v1/urls/count.json?url=${url}`,
         shareCount: data => data.count,
         popup: {
-            width: 750,
-            height: 550,
+            width: 830,
+            height: 700,
         },
     },
 

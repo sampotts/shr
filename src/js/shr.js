@@ -26,6 +26,7 @@ class Shr {
         this.elements = {
             count: null,
             trigger: null,
+            popup: null,
         };
 
         if (is.element(target)) {
@@ -42,10 +43,6 @@ class Shr {
 
         this.config = extend({}, defaults, options, { networks: constants });
 
-        this.init();
-    }
-
-    init() {
         this.console = new Console(this.config.debug);
 
         this.storage = new Storage(this.config.storage.key, this.config.storage.ttl, this.config.storage.enabled);
@@ -59,16 +56,30 @@ class Shr {
         this.elements.trigger.shr = this;
     }
 
+    /**
+     * Destroy the current instance
+     * @returns {Void}
+     */
     destroy() {
         this.listeners(false);
+
+        // TODO: Remove the count
     }
 
+    /**
+     * Setup event listeners
+     * @returns {Void}
+     */
     listeners(toggle = false) {
         const method = toggle ? 'addEventListener' : 'removeEventListener';
 
         this.elements.trigger[method]('click', event => this.share(event), false);
     }
 
+    /**
+     * Gets the href from the trigger link
+     * @returns {String}    The href attribute from the link
+     */
     get href() {
         if (!is.element(this.elements.trigger)) {
             return null;
@@ -78,7 +89,8 @@ class Shr {
     }
 
     /**
-     * Get the network for this instance
+     * Gets the network for this instance
+     * @returns {String}    The network name in lowercase
      */
     get network() {
         if (!is.element(this.elements.trigger)) {
@@ -90,6 +102,10 @@ class Shr {
         return Object.keys(networks).find(n => getDomain(this.href) === networks[n].domain);
     }
 
+    /**
+     * Gets the config for the specified network
+     * @returns {Object}    The config options
+     */
     get networkConfig() {
         if (is.empty(this.network)) {
             return null;
@@ -99,7 +115,8 @@ class Shr {
     }
 
     /**
-     * Parse the URL we are geting the share count for
+     * Gets the URL or ID we are geting the share count for
+     * @returns {String}    The target ID or URL we're sharing
      */
     get target() {
         if (is.empty(this.network)) {
@@ -124,7 +141,8 @@ class Shr {
     }
 
     /**
-     * String format an endpoint URL for JSONP
+     * Gets for the URL for the JSONP endpoint
+     * @returns {String}    The URL for the JSONP endpoint
      */
     get apiUrl() {
         if (is.empty(this.network)) {
@@ -145,6 +163,12 @@ class Shr {
         }
     }
 
+    /**
+     * Initiate the share process
+     * This must be user triggered or the popup will be blocked
+     * @param {Event} event     The user input event
+     * @returns {Void}
+     */
     share(event) {
         this.openPopup(event);
 
@@ -155,8 +179,8 @@ class Shr {
 
     /**
      * Displays a pop up window to share on the requested social network.
-     *
      * @param {Event} event   - Event that triggered the popup window.
+     * @returns {Void}
      */
     openPopup(event) {
         if (!is.event(event)) {
@@ -174,11 +198,11 @@ class Shr {
         // Set variables for the popup
         const size = this.networkConfig.popup;
         const { width, height } = size;
-        const name = `window-${this.network}`;
+        const name = `shr-popup--${this.network}`;
 
         // If window already exists, just focus it
-        if (window[name] && !window[name].closed) {
-            window[name].focus();
+        if (this.popup && !this.popup.closed) {
+            this.popup.focus();
 
             this.console.log('Popup re-focused.');
         } else {
@@ -191,23 +215,30 @@ class Shr {
             const y = window.screen.height / 2 - height / 2 + top;
 
             // Open that window
-            window[name] = window.open(this.href, this.network, `top=${y},left=${x},width=${width},height=${height}`);
+            this.popup = window.open(this.href, name, `top=${y},left=${x},width=${width},height=${height}`);
+
+            // Determine if the popup was blocked
+            const blocked = !this.popup || this.popup.closed || !is.boolean(this.popup.closed);
 
             // Focus new window
-            window[name].focus();
+            if (!blocked) {
+                this.popup.focus();
 
-            this.console.log('Popup opened.');
+                // Nullify opener to prevent "tab nabbing"
+                // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
+                // this.popup.opener = null;
+
+                this.console.log('Popup opened.');
+            } else {
+                this.console.error('Popup blocked.');
+            }
         }
-
-        // Nullify opener to prevent "tab nabbing"
-        // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
-        window[name].opener = null;
     }
 
     /**
      * Get the count for the url from API
-     *
      * @param {Boolean} useCache        Whether to use the local storage cache or not
+     * @returns {Promise}
      */
     getCount(useCache = true) {
         return new Promise((resolve, reject) => {
@@ -274,9 +305,9 @@ class Shr {
 
     /**
      * Display the count
-     *
      * @param {Number} input         - The count returned from the share count API
      * @param {Boolean} increment   -  Determines if we should increment the count or not
+     * @returns {Void}
      */
     updateDisplay(input, increment = false) {
         // If we're incrementing (e.g. on click)
@@ -319,6 +350,7 @@ class Shr {
      * Setup multiple instances
      * @param {String|Element|NodeList|Array} target
      * @param {Object} options
+     * @returns {Array}                                 An array of instances
      */
     static setup(target, options = {}) {
         let targets = null;

@@ -29,6 +29,7 @@ const rename = require('gulp-rename');
 const replace = require('gulp-replace');
 const size = require('gulp-size');
 const log = require('fancy-log');
+const del = require('del');
 
 // Deployment
 const aws = require('aws-sdk');
@@ -102,6 +103,12 @@ const babelrc = {
 // Size plugin
 const sizeOptions = { showFiles: true, gzip: true };
 
+// Clean out /dist
+gulp.task('clean', done => {
+    del(paths.upload.map(dir => path.join(dir, '*')));
+    done();
+});
+
 // JavaScript
 const namespace = 'Shr';
 
@@ -164,12 +171,14 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
     const name = `sprite:${filename}`;
     tasks.sprite.push(name);
 
+    log(path.basename(filename));
+
     gulp.task(name, () => {
         return gulp
             .src(entry.src)
             .pipe(imagemin())
             .pipe(svgstore())
-            .pipe(rename({ basename: path.basename(filename) }))
+            .pipe(rename({ basename: path.parse(filename).name }))
             .pipe(size(sizeOptions))
             .pipe(gulp.dest(entry.dist));
     });
@@ -188,7 +197,7 @@ gulp.task('watch', () => {
 });
 
 // Default gulp task
-gulp.task('default', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite, 'watch'));
+gulp.task('default', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'watch'));
 
 // Publish a version to CDN and docs
 // --------------------------------------------
@@ -310,7 +319,10 @@ gulp.task('docs:error', () => {
 });
 
 // Publish to Docs bucket
-gulp.task('docs', gulp.parallel('docs:readme', 'docs:src', 'docs:svg', 'docs:paths', 'docs:error'));
+gulp.task(
+    'docs',
+    gulp.series('clean', gulp.parallel('docs:readme', 'docs:src', 'docs:svg', 'docs:paths', 'docs:error'))
+);
 
 // Do everything
-gulp.task('deploy', gulp.series(gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'cdn', 'docs'));
+gulp.task('deploy', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'cdn', 'docs'));

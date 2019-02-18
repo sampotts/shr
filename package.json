@@ -1,14 +1,39 @@
 {
     "name": "shr",
-    "version": "2.0.0-beta.1",
+    "version": "2.0.0-beta.2",
     "description": "Simple, customizable sharing buttons",
     "homepage": "http://shr.one",
+    "author": "Sam Potts <sam@potts.es>",
+    "license": "MIT",
     "main": "dist/shr.js",
     "module": "dist/shr.mjs",
     "jsnext:main": "dist/shr.mjs",
     "browser": "dist/shr.js",
     "sass": "src/sass/shr.scss",
     "style": "dist/shr.css",
+    "browserslist": [
+        "> 1%",
+        "not dead"
+    ],
+    "keywords": [
+        "Facebook",
+        "Twitter",
+        "Pinterest",
+        "YouTube",
+        "Sharing",
+        "Share Buttons"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/sampotts/shr.git"
+    },
+    "bugs": {
+        "url": "https://github.com/sampotts/shr/issues"
+    },
+    "scripts": {
+        "lint": "eslint src/js",
+        "deploy": "yarn lint && gulp deploy"
+    },
     "dependencies": {},
     "devDependencies": {
         "aws-sdk": "^2.404.0",
@@ -16,6 +41,7 @@
         "@babel/preset-env": "^7.3.1",
         "babel-eslint": "^10.0.1",
         "babel-preset-minify": "^0.5.0",
+        "del": "^3.0.0",
         "eslint": "^5.14.0",
         "eslint-config-airbnb-base": "^13.1.0",
         "eslint-config-prettier": "^4.0.0",
@@ -48,24 +74,5 @@
         "stylelint-order": "^2.0.0",
         "stylelint-scss": "^3.5.3",
         "stylelint-selector-bem-pattern": "^2.0.0"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [
-        "Facebook",
-        "Twitter",
-        "Pinterest",
-        "YouTube",
-        "Sharing",
-        "Share Buttons"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/sampotts/shr.git"
-    },
-    "authors": [
-        "Sam Potts <sam@potts.es>"
-    ],
-    "license": "MIT"
+    }
 }
