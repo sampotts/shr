@@ -27,7 +27,7 @@
             "dist": "./dist"
         },
         "docs.svg": {
-            "src": "./docs/src/sprite/*.svg",
+            "src": "./src/sprite/*.svg",
             "dist": "./docs/dist"
         }
     }
