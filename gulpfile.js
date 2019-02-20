@@ -154,6 +154,7 @@ Object.entries(build.css).forEach(([filename, entry]) => {
     gulp.task(name, () => {
         return gulp
             .src(entry.src)
+            .pipe(plumber())
             .pipe(path.extname(entry.src) === '.less' ? less() : sass())
             .pipe(
                 prefix(browserslist, {
@@ -171,11 +172,10 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
     const name = `sprite:${filename}`;
     tasks.sprite.push(name);
 
-    log(path.basename(filename));
-
     gulp.task(name, () => {
         return gulp
             .src(entry.src)
+            .pipe(plumber())
             .pipe(imagemin())
             .pipe(svgstore())
             .pipe(rename({ basename: path.parse(filename).name }))
@@ -197,7 +197,14 @@ gulp.task('watch', () => {
 });
 
 // Default gulp task
-gulp.task('default', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'watch'));
+gulp.task(
+    'default',
+    gulp.series(
+        'clean',
+        gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite),
+        'watch'
+    )
+);
 
 // Publish a version to CDN and docs
 // --------------------------------------------
@@ -321,8 +328,25 @@ gulp.task('docs:error', () => {
 // Publish to Docs bucket
 gulp.task(
     'docs',
-    gulp.series('clean', gulp.parallel('docs:readme', 'docs:src', 'docs:svg', 'docs:paths', 'docs:error'))
+    gulp.series(
+        'clean',
+        gulp.parallel(
+            'docs:readme',
+            'docs:src',
+            'docs:svg',
+            'docs:paths',
+            'docs:error'
+        )
+    )
 );
 
 // Do everything
-gulp.task('deploy', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'cdn', 'docs'));
+gulp.task(
+    'deploy',
+    gulp.series(
+        'clean',
+        gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite),
+        'cdn',
+        'docs'
+    )
+);

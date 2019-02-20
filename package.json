@@ -12,8 +12,7 @@
     "sass": "src/sass/shr.scss",
     "style": "dist/shr.css",
     "browserslist": [
-        "> 1%",
-        "not dead"
+        "> 1%"
     ],
     "keywords": [
         "Facebook",
@@ -36,13 +35,13 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "aws-sdk": "^2.404.0",
+        "aws-sdk": "^2.406.0",
         "@babel/core": "^7.3.3",
         "@babel/preset-env": "^7.3.1",
         "babel-eslint": "^10.0.1",
         "babel-preset-minify": "^0.5.0",
         "del": "^3.0.0",
-        "eslint": "^5.14.0",
+        "eslint": "^5.14.1",
         "eslint-config-airbnb-base": "^13.1.0",
         "eslint-config-prettier": "^4.0.0",
         "eslint-plugin-import": "^2.16.0",
@@ -59,7 +58,7 @@
         "gulp-replace": "^1.0.0",
         "gulp-sass": "^4.0.2",
         "gulp-size": "^3.0.0",
-        "gulp-sourcemaps": "^2.6.4",
+        "gulp-sourcemaps": "^2.6.5",
         "gulp-svgstore": "^7.0.1",
         "gulp-terser": "^1.1.7",
         "prettier-eslint": "^8.8.2",
