@@ -28,8 +28,8 @@ import is from '../utils/is';
 const constants = {
     facebook: {
         domain: 'facebook.com',
-        url: url => `https://graph.facebook.com/?id=${url}`,
-        shareCount: data => data.share.share_count,
+        url: url => `https://graph.facebook.com/?id=${url}&fields=og_object{engagement}`,
+        shareCount: data => data.og_object.engagement.count,
         popup: {
             width: 640,
             height: 360,
