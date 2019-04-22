@@ -14,17 +14,20 @@ export default class Console {
     }
 
     get log() {
-        // eslint-disable-next-line no-console
-        return this.enabled ? Function.prototype.bind.call(console.log, console) : noop;
+        return this.enabled
+            ? Function.prototype.bind.call(console.log, console) // eslint-disable-line no-console
+            : noop;
     }
 
     get warn() {
-        // eslint-disable-next-line no-console
-        return this.enabled ? Function.prototype.bind.call(console.warn, console) : noop;
+        return this.enabled
+            ? Function.prototype.bind.call(console.warn, console) // eslint-disable-line no-console
+            : noop;
     }
 
     get error() {
-        // eslint-disable-next-line no-console
-        return this.enabled ? Function.prototype.bind.call(console.error, console) : noop;
+        return this.enabled
+            ? Function.prototype.bind.call(console.error, console) // eslint-disable-line no-console
+            : noop;
     }
 }

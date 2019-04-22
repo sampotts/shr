@@ -28,6 +28,7 @@ const plumber = require('gulp-plumber');
 const rename = require('gulp-rename');
 const replace = require('gulp-replace');
 const size = require('gulp-size');
+const ansi = require('ansi-colors');
 const log = require('fancy-log');
 const del = require('del');
 
@@ -228,13 +229,13 @@ const localpath = new RegExp('(../)?dist', 'gi');
 
 // Publish version to CDN bucket
 gulp.task('cdn', () => {
-    const { bucket, publisher } = deploy.cdn;
+    const { domain, publisher } = deploy.cdn;
 
     if (!publisher) {
         throw new Error('No publisher instance. Check AWS configuration.');
     }
 
-    log(`Uploading ${version} to ${bucket}`);
+    log(`Uploading ${ansi.green.bold(pkg.version)} to ${ansi.cyan(domain)}...`);
 
     // Upload to CDN
     return gulp
