@@ -31,4 +31,4 @@ export function extend(target = {}, ...sources) {
     return extend(target, ...sources);
 }
 
-export default {};
+export default { extend };

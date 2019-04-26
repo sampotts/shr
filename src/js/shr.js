@@ -10,6 +10,7 @@ import defaults from './config/defaults';
 import { getJSONP } from './utils/ajax';
 import Console from './utils/console';
 import { matches } from './utils/css';
+import { createElement, wrap } from './utils/elements';
 import is from './utils/is';
 import { formatNumber } from './utils/numbers';
 import { extend } from './utils/objects';
@@ -319,29 +320,45 @@ class Shr {
         // Only display if there's a count
         if (count > 0 || this.config.count.displayZero) {
             const isAfter = position === 'after';
+            const round = unit => Math.round((count / unit) * 10) / 10;
 
             // Format
             let label;
-            if (this.config.count.format && count > 1000000) {
-                label = `${Math.round(count / 1000000)}M`;
-            } else if (this.config.count.format && count > 1000) {
-                label = `${Math.round(count / 1000)}K`;
-            } else {
+            if (count < 1000 || !this.config.count.format) {
                 label = formatNumber(count);
+            } else {
+                if (count > 1000000) {
+                    label = `${round(1000000)}M`;
+                }
+
+                label = `${round(1000)}K`;
             }
 
             // Update or insert
             if (is.element(this.elements.count)) {
                 this.elements.count.textContent = label;
             } else {
-                // Insert count display
-                this.elements.trigger.insertAdjacentHTML(
-                    isAfter ? 'afterend' : 'beforebegin',
-                    this.config.count.html(label, this.config.count.classname, position)
+                const { count, wrapper } = this.config;
+
+                // Add wrapper
+                wrap(
+                    this.elements.trigger,
+                    createElement('span', {
+                        class: wrapper.className,
+                    }),
                 );
 
-                // Store reference
-                this.elements.count = this.elements.trigger[isAfter ? 'nextSibling' : 'previousSibling'];
+                // Create count display
+                this.elements.count = createElement(
+                    'span',
+                    {
+                        class: `${count.className} ${count.className}--${position}`,
+                    },
+                    label,
+                );
+
+                // Insert count display
+                this.elements.trigger.insertAdjacentElement(isAfter ? 'afterend' : 'beforebegin', this.elements.count);
             }
         }
     }

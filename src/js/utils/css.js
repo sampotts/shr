@@ -16,4 +16,4 @@ export function matches(element, selector) {
     return matches.call(element, selector);
 }
 
-export default {};
+export default { matches };

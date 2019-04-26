@@ -2,25 +2,41 @@
 // Button styling
 // ==========================================================================
 
+.shr,
+.shr__button {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-top: ceil($shr-padding-base / 4);
+    margin-bottom: ceil($shr-padding-base / 4);
+    white-space: nowrap;
+}
+
+// Cancel out margin for wrapped buttons
+.shr .shr__button {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+// Adjacent buttons
+.shr + .shr,
+.shr__button + .shr__button,
+.shr + .shr__button,
+.shr__button + .shr {
+    margin-left: ceil($shr-padding-base / 2);
+}
+
 // Shared
-.shr-button,
-.shr-count {
+.shr__button,
+.shr__count {
     vertical-align: middle;
     border-radius: $shr-button-border-radius;
     font-weight: $shr-font-weight;
     box-shadow: transparentize($color: #000, $amount: 0.1);
 }
 
-.shr-button + .shr-button,
-.shr-count--after + .shr-button,
-.shr-button + .shr-count--before {
-    margin-left: ceil($shr-padding-base / 2);
-}
-
 // Buttons
-.shr-button {
-    display: inline-flex;
-    align-items: center;
+.shr__button {
     padding: ceil($shr-padding-base / 4) ceil($shr-padding-base / 2);
     @include shr-button-styles();
     transition: all 0.3s ease;
@@ -49,28 +65,33 @@
     }
 
     // Network specific styles
-    &-facebook {
+    &--facebook {
         @include shr-button-styles($shr-button-facebook-bg-color);
     }
-    &-twitter {
+
+    &--twitter {
         @include shr-button-styles($shr-button-twitter-bg-color);
     }
-    &-pinterest {
+
+    &--pinterest {
         @include shr-button-styles($shr-button-pinterest-bg-color);
     }
-    &-google {
+
+    &--google {
         @include shr-button-styles($shr-button-google-bg-color);
     }
-    &-github {
+
+    &--github {
         @include shr-button-styles($shr-button-github-bg-color, darken($shr-button-github-bg-color, 10%));
     }
-    &-youtube {
+
+    &--youtube {
         @include shr-button-styles($shr-button-youtube-bg-color);
     }
 }
 
 // Count bubble
-.shr-count {
+.shr__count {
     display: inline-block;
     position: relative;
     padding: ($shr-padding-base / 4) ($shr-padding-base / 3);
@@ -91,7 +112,7 @@
     }
 }
 
-.shr-count--after {
+.shr__count--after {
     margin-left: ($shr-padding-base / 2);
 
     &::before {
@@ -100,7 +121,7 @@
     }
 }
 
-.shr-count--before {
+.shr__count--before {
     margin-right: ($shr-padding-base / 2);
 
     &::before {

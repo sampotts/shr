@@ -49,13 +49,15 @@
 
 const defaults = {
     debug: false,
+    wrapper: {
+        className: 'shr',
+    },
     count: {
-        classname: 'shr-count',
+        className: 'shr__count',
         displayZero: true,
         format: true,
         position: 'after',
         increment: true,
-        html: (count, classname, position) => `<span class="${classname} ${classname}--${position}">${count}</span>`,
     },
     tokens: {
         github: '',

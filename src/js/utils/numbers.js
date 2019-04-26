@@ -10,4 +10,4 @@ export function formatNumber(number) {
         .replace(regex, '');
 }
 
-export default {};
+export default { formatNumber };

@@ -17,4 +17,4 @@ export function getDomain(href) {
     return domain;
 }
 
-export default {};
+export default { getDomain };

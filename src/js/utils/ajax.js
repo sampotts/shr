@@ -34,4 +34,4 @@ export function getJSONP(url) {
     });
 }
 
-export default {};
+export default { getJSONP };
