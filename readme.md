@@ -23,12 +23,6 @@ Oh and yes, it works with Bootstrap.
 
 Check out [the changelog](changelog.md)
 
-## Planned development
-
--   More networks
-
-If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/sampotts/shr/issues/new) or of course, forking and sending a pull request.
-
 ## Setup
 
 To set up Shr, you first must include the JavaScript lib and optionally the CSS and SVG sprite if you want icons on your buttons.
@@ -131,13 +125,7 @@ You don't have to use the Shr CSS. You're free to style the buttons how you like
 
 ### 4. SVG Sprite (_optional_)
 
-Again, you don't _need_ the sprite, unless you want to use the default styling.
-
-If you already have a sprite system, then you can include the SVG icons as-is.
-
-### Loading the SVG sprite (optional)
-
-To display the icons for each social network as per the demo, you can load the `shr.svg` that is distributed with Shr. To load the sprite, you can use something like [sprite.js](https://gist.github.com/sampotts/15adab33ff3af87f902db0253f0df8dd).
+Ir you want to display the icons for each social network as per the demo, you can use the included [SVG sprite](https://css-tricks.com/svg-sprites-use-better-icon-fonts/). If you already have a sprite system, then you can include the SVG icons as-is. Otherwise, you can use something like [sprite.js](https://gist.github.com/sampotts/15adab33ff3af87f902db0253f0df8dd).
 
 ## API
 
