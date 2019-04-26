@@ -64,7 +64,7 @@ class Shr {
     destroy() {
         this.listeners(false);
 
-        // TODO: Remove the count
+        // TODO: Remove the count and unwrap
     }
 
     /**
@@ -184,17 +184,15 @@ class Shr {
      * @returns {Void}
      */
     openPopup(event) {
-        if (!is.event(event)) {
-            return;
-        }
-
         // Only popup if we need to...
         if (is.empty(this.network) || !this.networkConfig.popup) {
             return;
         }
 
         // Prevent the link opening
-        event.preventDefault();
+        if (is.event(event)) {
+            event.preventDefault();
+        }
 
         // Set variables for the popup
         const size = this.networkConfig.popup;
@@ -261,7 +259,7 @@ class Shr {
 
                 if (!is.empty(cached) && Object.keys(cached).includes(this.network)) {
                     resolve(cached[this.network]);
-                    this.console.log('getCount resolved from cache.');
+                    this.console.log(`getCount for '${this.target}' for '${this.network}' resolved from cache`);
                     return;
                 }
             }

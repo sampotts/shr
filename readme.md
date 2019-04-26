@@ -2,22 +2,20 @@
 
 Simple, clean, customizable sharing buttons.
 
-[Donate to support Shr](#donate)
-
-[Checkout the demo](http://shr.one)
+[Donate to support Shr](#donate) - [Checkout the demo](http://shr.one)
 
 ## Why?
 
-The default share buttons used by the social networks are not only ugly to look at (sorry, they just are) but they usually depend on iframes and all sorts of other horrible, slow code. That led to creating shr (short for share).
+The default share buttons used by the social networks are not only ugly to look at (sorry, they just are) but they usually depend on iframes, are slow and generally heavy. That led to me creating shr (short for share).
 
 ## Features
 
--   **Accessible** - built right, using progressive enhancement.
--   **Lightweight** - just 1.9KB minified and gzipped.
--   **Customisable** - make the buttons and count look how you want with the markup you want.
--   **Semantic** - uses the _right_ elements. There's no `<span>` as button type hacks.
--   **Fast** - uses local storage to cache results to keep things fast.
--   **No dependencies** - written in vanilla JavaScript, no jQuery required.
+-   **Accessible** - built right, using progressive enhancement
+-   **Lightweight** - just 3KB minified and gzipped
+-   **Customisable** - make the buttons and count look how you want with the markup you want
+-   **Semantic** - uses the _right_ elements. There's no `<span>`s as buttons type hacks
+-   **Fast** - uses local storage to cache results to keep things fast
+-   **No dependencies** - written in vanilla ES6 JavaScript
 
 Oh and yes, it works with Bootstrap.
 
@@ -33,79 +31,141 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 ## Setup
 
-To set up Shr, you first must include the Shr CSS and JS along with the sprite that contains the social icons. There are two ways you can load the CSS and JS:
+To set up Shr, you first must include the JavaScript lib and optionally the CSS and SVG sprite if you want icons on your buttons.
 
-### CDN
+### 1. HTML
 
-If you want to use our CDN, you can use the following:
-
-```html
-<link rel="stylesheet" href="https://shr.one/2.0.0-beta.1/shr.css" />
-<script src="https://shr.one/2.0.0-beta.1/shr.js"></script>
-```
-
-### Include Your Own Files
-
-If you want to use the default css, add the `shr.css` file from /dist into your head, or even better use `shr.less` or `shr.scss` file included in `/src` in your build to save an HTTP request.
+Here's an example for a Facebook button, see [the demo source](https://github.com/sampotts/shr/blob/master/demo/index.html) for other examples.
 
 ```html
-<link rel="stylesheet" href="dist/shr.css" />
+<a
+    href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fshr.one"
+    target="_blank"
+    class="shr__button shr__button--facebook js-shr"
+>
+    <svg><use xlink:href="#shr-facebook"></use></svg>
+    Share
+</a>
 ```
 
-You will also need to add the `shr.js` file from the /dist into your head.
+This markup assumes you're using the SVG sprite (which is optional) and the default CSS. If you're not using either of these then you can omit the `shr__*` classNames completely and the `<svg>`. The `href` attribute value is used to determine the type of network. It is also used as the fallback so must be valid.
+
+Once Shr has been initialized on a button and data has been fetched, it is manipulated as below:
 
 ```html
-<script src="dist/shr.js"></script>
+<span class="shr">
+    <a
+        href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fshr.one"
+        target="_blank"
+        class="shr__button shr__button--facebook js-shr"
+    >
+        <svg><use xlink:href="#shr-facebook"></use></svg>
+        Share
+    </a>
+    <span class="shr__count shr__count--after">888</span>
+</span>
 ```
 
-### Loading the Sprite
+-   The outer `<span>` is a wrapper so that we can prevent the count wrapping under the button and just looking odd
+-   The count `<span>` is used as the bubble for the current count for share, star or subscriber, etc
+-   The className for both of these elements can be changed in [options](#options)
 
-To get the beautiful images for each social network, you must include the `sprite.svg` that is distributed with Shr. To do this, add the following script to your document near the closing body tag:
+### 2. JavaScript
 
-```html
-<script>
-    (function(d, u) {
-        var x = new XMLHttpRequest();
-        var b = d.body;
+There are two ways you can get up and running with JavaScript:
 
-        // Check for CORS support
-        // If you're loading from same domain, you can remove the if statement
-        // XHR for Chrome/Firefox/Opera/Safari
-        if ('withCredentials' in x) {
-            x.open('GET', u, true);
-        }
-        // XDomainRequest for older IE
-        else if (typeof XDomainRequest != 'undefined') {
-            x = new XDomainRequest();
-            x.open('GET', u);
-        } else {
-            return;
-        }
+#### via the npm package
 
-        x.send();
-        x.onload = function() {
-            var c = d.createElement('div');
-            c.setAttribute('hidden', '');
-            c.innerHTML = x.responseText;
-            b.insertBefore(c, b.childNodes[0]);
-        };
-    })(document, '../dist/sprite.svg');
-</script>
+If you're using npm/yarn to manage your dependencies, you can add `shr-buttons`:
+
+```bash
+npm install --save shr-buttons
 ```
 
-What this does, is creates a new `XMLHttpRequest` and loads the `sprite.svg` file. Make sure you update the file path to the right location for your project.
-
-The `sprite.svg` contains all of the SVG icons for the social networks. If you jump ahead to any of the social networks you will see a `<use>` tag (Ex: Google: `<svg><use xlink:href="#shr-google"></use></svg>+1`). The `href` attribute in the `use` references a single SVG within the sprite. We load the entire sprite so it's only one HTTP request and it speeds up your site!
-
-### Initializing
-
-Now that everything has been loaded correctly, all you have to do is call:
+and then in your JavaScript app:
 
 ```javascript
-shr.setup({});
+import Shr from 'shr-buttons';
 ```
 
-You can pass a JSON object of all of the different options to this setup function.
+#### via a `<script>` element
+
+Add the following before you're closing `</body>`:
+
+```html
+<script src="https://shr.one/2.0.0-beta.8/shr.js"></script>
+```
+
+Alternatively add the script to your main app bundle.
+
+##### Initialize
+
+```javascript
+const buttons = Shr.setup('.js-shr', { ...options });
+```
+
+This will setup all elements that match the `.js-shr` selector. The first argument must be either a:
+
+-   CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector),
+-   a [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
+-   a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
+-   an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
+
+The `options` are the [options](#options) you would like to use.
+
+_Note_: `Shr.setup` will also look for mutations of the DOM and and matching elements will also be setup if they are injected into the DOM after initial setup.
+
+`Shr.setup` returns an array of buttons it setup. Alternatively you can setup an individual button:
+
+```javascript
+const button = new Shr('.js-shr', { ...options });
+```
+
+### 3. CSS _(optional)_
+
+You don't have to use the Shr CSS. You're free to style the buttons how you like. You can either include the SASS in your build or use the CDN hosted CSS in your `<head>`:
+
+```html
+<link rel="stylesheet" href="https://shr.one/2.0.0-beta.8/shr.css" />
+```
+
+### 4. SVG Sprite (_optional_)
+
+Again, you don't _need_ the sprite, unless you want to use the default styling.
+
+If you already have a sprite system, then you can include the SVG icons as-is.
+
+### Loading the SVG sprite (optional)
+
+To display the icons for each social network as per the demo, you can load the `shr.svg` that is distributed with Shr. To load the sprite, you can use something like [sprite.js](https://gist.github.com/sampotts/15adab33ff3af87f902db0253f0df8dd).
+
+## API
+
+A few useful methods are exposed. To call an API method, you need a reference to the instance. This is returned from `Shr.setup` or your call the the constructor (`new Shr`), e.g.:
+
+```javascript
+const button = new Shr('.js-shr-facebook', { ...options });
+
+button
+    .getCount()
+    .then(count => {
+        // Do something with count 😎
+    })
+    .catch(error => {
+        // Something went wrong 😢
+    });
+```
+
+| Method             | Parameters | Description                                                                                                                                                                                          |
+| ------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `getCount()`       | -          | Returns a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) that will either resolve with a count or an error.                                   |
+| `openPopup(event)` | `Event`    | Open the associated dialog. This will be blocked unless it is as a result of user input. We'd suggest calling this as the callback for `addEventListener` or similar and passing the relevant event. |
+
+---
+
+The following needs revision.
+
+---
 
 ## Options
 
@@ -453,36 +513,19 @@ This button allows you to star a repo on GitHub and shows the current number of 
 
 ## Browser support
 
-<table width="100%" style="text-align: center">
-    <thead>
-        <tr>
-            <td>Safari</td>
-            <td>Firefox</td>
-            <td>Chrome</td>
-            <td>Opera</td>
-            <td>IE9</td>
-            <td>IE10+</td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>✔</td>
-            <td>✔</td>
-            <td>✔</td>
-            <td>✔</td>
-            <td>✔</td>
-            <td>✔</td>
-        </tr>
-    </tbody>
-</table>
+Shr is supported in all modern browsers and IE11.
 
-## Issues If you find anything weird with Shr, please let us know using the GitHub issues tracker. ## Author Shr is
+## Issues
 
-developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me)
+If you find anything weird with Shr, please let us know using the GitHub issues tracker.
 
-## Donate Shr costs money
+## Author
 
-to run, not my time - I donate that for free but domains, hosting and more. Any help is appreciated... [Donate to support Shr](https://www.paypal.me/pottsy/20usd)
+Shr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me)
+
+## Donate
+
+Shr costs money to run, not my time (I donate that for free) but domains, hosting and more. Any help is appreciated... [Donate to support Shr](https://www.paypal.me/pottsy/20usd)
 
 ## Thanks
 
