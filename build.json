@@ -5,16 +5,16 @@
             "dist": "./dist/",
             "formats": ["es", "umd"]
         },
-        "docs.js": {
-            "src": "./docs/src/js/docs.js",
-            "dist": "./docs/dist/",
+        "app.js": {
+            "src": "./demo/src/js/app.js",
+            "dist": "./dist/",
             "formats": ["iife"]
         }
     },
     "css": {
-        "docs.css": {
-            "src": "./docs/src/less/docs.less",
-            "dist": "./docs/dist/"
+        "app.css": {
+            "src": "./demo/src/less/app.less",
+            "dist": "./dist/"
         },
         "shr.css": {
             "src": "./src/sass/shr.scss",
@@ -25,10 +25,6 @@
         "shr.svg": {
             "src": "./src/sprite/*.svg",
             "dist": "./dist"
-        },
-        "docs.svg": {
-            "src": "./src/sprite/*.svg",
-            "dist": "./docs/dist"
         }
     }
 }

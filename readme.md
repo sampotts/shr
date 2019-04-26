@@ -71,25 +71,25 @@ To get the beautiful images for each social network, you must include the `sprit
         // Check for CORS support
         // If you're loading from same domain, you can remove the if statement
         // XHR for Chrome/Firefox/Opera/Safari
-        if ("withCredentials" in x) {
-            x.open("GET", u, true);
+        if ('withCredentials' in x) {
+            x.open('GET', u, true);
         }
         // XDomainRequest for older IE
-        else if (typeof XDomainRequest != "undefined") {
+        else if (typeof XDomainRequest != 'undefined') {
             x = new XDomainRequest();
-            x.open("GET", u);
+            x.open('GET', u);
         } else {
             return;
         }
 
         x.send();
         x.onload = function() {
-            var c = d.createElement("div");
-            c.setAttribute("hidden", "");
+            var c = d.createElement('div');
+            c.setAttribute('hidden', '');
             c.innerHTML = x.responseText;
             b.insertBefore(c, b.childNodes[0]);
         };
-    })(document, "../dist/sprite.svg");
+    })(document, '../dist/sprite.svg');
 </script>
 ```
 
@@ -119,7 +119,7 @@ If you are are just debugging Shr in a development environment, you can turn on 
 
 ```javascript
 shr.setup({
-    debug: true
+    debug: true,
 });
 ```
 
@@ -131,7 +131,7 @@ The selector is the attribute on the element that Shr is binding to. This contai
 
 ```javascript
 shr.setup({
-    selector: "data-your-selector-name"
+    selector: 'data-your-selector-name',
 });
 ```
 
@@ -139,15 +139,15 @@ shr.setup({
 
 _Default_: `share-count`
 
-When adding the share count element to the screen, this is the classname used to style it.
+When adding the share count element to the screen, this is the className used to style it.
 
 This is a nested option within the `count` object.
 
 ```javascript
 shr.setup({
     count: {
-        classname: "your-class-name"
-    }
+        className: 'your-class-name',
+    },
 });
 ```
 
@@ -162,8 +162,8 @@ This is a nested option within the `count` object.
 ```javascript
 shr.setup({
     count: {
-        displayZero: true
-    }
+        displayZero: true,
+    },
 });
 ```
 
@@ -178,8 +178,8 @@ This is a nested option within the `count` object.
 ```javascript
 shr.setup({
     count: {
-        format: false
-    }
+        format: false,
+    },
 });
 ```
 
@@ -194,8 +194,8 @@ This is a nested option within the `count` object.
 ```javascript
 shr.setup({
     count: {
-        position: "before"
-    }
+        position: 'before',
+    },
 });
 ```
 
@@ -210,8 +210,8 @@ This is a nested option within the `count` object.
 ```javascript
 shr.setup({
     count: {
-        increment: false
-    }
+        increment: false,
+    },
 });
 ```
 
@@ -233,9 +233,9 @@ This is a nested option within the `count` object.
 shr.setup({
     count: {
         html: function(count, classname, position) {
-            return "{YOUR CONSTRUCTED HTML HERE}";
-        }
-    }
+            return '{YOUR CONSTRUCTED HTML HERE}';
+        },
+    },
 });
 ```
 
@@ -257,9 +257,9 @@ shr.setup({
     google: {
         popup: {
             width: 1024,
-            height: 768
-        }
-    }
+            height: 768,
+        },
+    },
 });
 ```
 
@@ -281,9 +281,9 @@ shr.setup({
     facebook: {
         popup: {
             width: 1024,
-            height: 768
-        }
-    }
+            height: 768,
+        },
+    },
 });
 ```
 
@@ -305,9 +305,9 @@ shr.setup({
     twitter: {
         popup: {
             width: 1024,
-            height: 768
-        }
-    }
+            height: 768,
+        },
+    },
 });
 ```
 
@@ -329,9 +329,9 @@ shr.setup({
     pinterest: {
         popup: {
             width: 1024,
-            height: 768
-        }
-    }
+            height: 768,
+        },
+    },
 });
 ```
 

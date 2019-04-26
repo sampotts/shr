@@ -65,19 +65,17 @@ const paths = {
             sprite: path.join(root, 'src/sprite/*.svg'),
         },
     },
-    docs: {
+    demo: {
         // Source paths
         src: {
-            less: path.join(root, 'docs/src/less/**/*'),
-            js: path.join(root, 'docs/src/js/**/*'),
-            sprite: path.join(root, 'docs/src/sprite/**/*'),
+            less: path.join(root, 'demo/src/less/**/*'),
+            js: path.join(root, 'demo/src/js/**/*'),
+            sprite: path.join(root, 'demo/src/sprite/**/*'),
         },
-        // Output paths
-        dist: path.join(root, 'docs/dist/'),
         // Docs
-        root: path.join(root, 'docs/'),
+        root: path.join(root, 'demo/'),
     },
-    upload: [path.join(root, 'dist/**'), path.join(root, 'docs/dist/**')],
+    upload: [path.join(root, 'dist/**')],
 };
 
 // Task arrays
@@ -131,18 +129,18 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                         {
                             name: namespace,
                             format,
-                        }
-                    )
+                        },
+                    ),
                 )
                 .pipe(terser())
                 .pipe(
                     rename({
                         extname: `.${format === 'es' ? 'mjs' : 'js'}`,
-                    })
+                    }),
                 )
                 .pipe(size(sizeOptions))
                 .pipe(sourcemaps.write(''))
-                .pipe(gulp.dest(entry.dist))
+                .pipe(gulp.dest(entry.dist)),
         );
     });
 });
@@ -160,11 +158,11 @@ Object.entries(build.css).forEach(([filename, entry]) => {
             .pipe(
                 prefix(browserslist, {
                     cascade: false,
-                })
+                }),
             )
             .pipe(clean())
             .pipe(size(sizeOptions))
-            .pipe(gulp.dest(entry.dist))
+            .pipe(gulp.dest(entry.dist)),
     );
 });
 
@@ -177,11 +175,17 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
         gulp
             .src(entry.src)
             .pipe(plumber())
-            .pipe(imagemin())
+            .pipe(
+                imagemin([
+                    imagemin.svgo({
+                        plugins: [{ removeViewBox: false }],
+                    }),
+                ]),
+            )
             .pipe(svgstore())
             .pipe(rename({ basename: path.parse(filename).name }))
             .pipe(size(sizeOptions))
-            .pipe(gulp.dest(entry.dist))
+            .pipe(gulp.dest(entry.dist)),
     );
 });
 
@@ -192,22 +196,15 @@ gulp.task('watch', () => {
     gulp.watch(paths.shr.src.sass, gulp.parallel(...tasks.css));
     gulp.watch(paths.shr.src.sprite, gulp.parallel(...tasks.sprite));
 
-    // Docs
-    gulp.watch(paths.docs.src.js, gulp.parallel(...tasks.js));
-    gulp.watch(paths.docs.src.less, gulp.parallel(...tasks.css));
+    // Demo
+    gulp.watch(paths.demo.src.js, gulp.parallel(...tasks.js));
+    gulp.watch(paths.demo.src.less, gulp.parallel(...tasks.css));
 });
 
 // Default gulp task
-gulp.task(
-    'default',
-    gulp.series(
-        'clean',
-        gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite),
-        'watch'
-    )
-);
+gulp.task('default', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'watch'));
 
-// Publish a version to CDN and docs
+// Publish a version to CDN and demo
 // --------------------------------------------
 
 // Some options
@@ -216,7 +213,7 @@ const headers = {
     cdn: {
         'Cache-Control': `max-age=${maxAge}`,
     },
-    docs: {
+    demo: {
         'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
     },
 };
@@ -244,20 +241,20 @@ gulp.task('cdn', () => {
             size({
                 showFiles: true,
                 gzip: true,
-            })
+            }),
         )
         .pipe(
             rename(path => {
                 path.dirname = path.dirname.replace('.', version);
-            })
+            }),
         )
         .pipe(publisher.publish(headers.cdn))
         .pipe(publish.reporter());
 });
 
 // Replace versioned files in readme.md
-gulp.task('docs:readme', () => {
-    const { domain } = deploy.docs;
+gulp.task('demo:readme', () => {
+    const { domain } = deploy.demo;
 
     return gulp
         .src([`${root}/readme.md`])
@@ -266,15 +263,15 @@ gulp.task('docs:readme', () => {
 });
 
 // Replace versions in shr.js
-gulp.task('docs:src', () =>
+gulp.task('demo:src', () =>
     gulp
         .src(path.join(root, 'src/js/shr.js'))
         .pipe(replace(semver, `v${version}`))
-        .pipe(gulp.dest(path.join(root, 'src/js/')))
+        .pipe(gulp.dest(path.join(root, 'src/js/'))),
 );
 
 // Replace versions in shr.js
-gulp.task('docs:svg', () => {
+gulp.task('demo:svg', () => {
     const { domain, publisher } = deploy.cdn;
 
     if (!publisher) {
@@ -282,21 +279,21 @@ gulp.task('docs:svg', () => {
     }
 
     return gulp
-        .src(path.join(root, 'docs/dist/docs.js'))
+        .src(path.join(root, 'dist/app.js'))
         .pipe(replace(localpath, `https://${domain}/${version}`))
         .pipe(
             rename(path => {
                 path.dirname = path.dirname.replace('.', version);
-            })
+            }),
         )
         .pipe(publisher.publish(headers.cdn))
         .pipe(publish.reporter());
 });
 
-// Replace local file paths with remote paths in docs
+// Replace local file paths with remote paths in demo
 // e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
-gulp.task('docs:paths', () => {
-    const { publisher } = deploy.docs;
+gulp.task('demo:paths', () => {
+    const { publisher } = deploy.demo;
     const { domain } = deploy.cdn;
 
     if (!publisher) {
@@ -304,15 +301,15 @@ gulp.task('docs:paths', () => {
     }
 
     return gulp
-        .src([`${paths.docs.root}*.html`])
+        .src([`${paths.demo.root}*.html`])
         .pipe(replace(localpath, `https://${domain}/${version}`))
-        .pipe(publisher.publish(headers.docs))
+        .pipe(publisher.publish(headers.demo))
         .pipe(publish.reporter());
 });
 
-// Upload error.html to cdn (as well as docs site)
-gulp.task('docs:error', () => {
-    const { publisher } = deploy.docs;
+// Upload error.html to cdn (as well as demo site)
+gulp.task('demo:error', () => {
+    const { publisher } = deploy.demo;
     const { domain } = deploy.cdn;
 
     if (!publisher) {
@@ -320,34 +317,17 @@ gulp.task('docs:error', () => {
     }
 
     return gulp
-        .src([`${paths.docs.root}error.html`])
+        .src([`${paths.demo.root}error.html`])
         .pipe(replace(localpath, `https://${domain}/${version}`))
-        .pipe(publisher.publish(headers.docs))
+        .pipe(publisher.publish(headers.demo))
         .pipe(publish.reporter());
 });
 
-// Publish to Docs bucket
+// Publish to Demo bucket
 gulp.task(
-    'docs',
-    gulp.series(
-        'clean',
-        gulp.parallel(
-            'docs:readme',
-            'docs:src',
-            'docs:svg',
-            'docs:paths',
-            'docs:error'
-        )
-    )
+    'demo',
+    gulp.series('clean', gulp.parallel('demo:readme', 'demo:src', 'demo:svg', 'demo:paths', 'demo:error')),
 );
 
 // Do everything
-gulp.task(
-    'deploy',
-    gulp.series(
-        'clean',
-        gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite),
-        'cdn',
-        'docs'
-    )
-);
+gulp.task('deploy', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'cdn', 'demo'));
