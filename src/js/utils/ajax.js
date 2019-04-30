@@ -8,7 +8,6 @@ export function getJSONP(url) {
     return new Promise((resolve, reject) => {
         // Generate a random callback
         const name = `jsonp_callback_${Math.round(100000 * Math.random())}`;
-
         // Create a faux script
         const script = document.createElement('script');
 

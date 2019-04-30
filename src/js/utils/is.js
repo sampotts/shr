@@ -4,7 +4,6 @@
 
 const getConstructor = input => (input !== null && typeof input !== 'undefined' ? input.constructor : null);
 const instanceOf = (input, constructor) => Boolean(input && constructor && input instanceof constructor);
-
 const isNullOrUndefined = input => input === null || typeof input === 'undefined';
 const isObject = input => getConstructor(input) === Object;
 const isNumber = input => getConstructor(input) === Number && !Number.isNaN(input);

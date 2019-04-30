@@ -208,7 +208,6 @@ class Shr {
             // Get position
             const left = window.screenLeft !== undefined ? window.screenLeft : window.screen.left;
             const top = window.screenTop !== undefined ? window.screenTop : window.screen.top;
-
             // Open in the centre of the screen
             const x = window.screen.width / 2 - width / 2 + left;
             const y = window.screen.height / 2 - height / 2 + top;
@@ -311,7 +310,6 @@ class Shr {
     updateDisplay(input, increment = false) {
         // If we're incrementing (e.g. on click)
         const count = increment ? input + 1 : input;
-
         // Standardize position
         const position = this.config.count.position.toLowerCase();
 
@@ -319,7 +317,6 @@ class Shr {
         if (count > 0 || this.config.count.displayZero) {
             const isAfter = position === 'after';
             const round = unit => Math.round((count / unit) * 10) / 10;
-
             // Format
             let label;
             if (count < 1000 || !this.config.count.format) {

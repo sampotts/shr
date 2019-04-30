@@ -16,7 +16,6 @@ export function wrap(elements, wrapper) {
         .reverse()
         .forEach((element, index) => {
             const child = index > 0 ? wrapper.cloneNode(true) : wrapper;
-
             // Cache the current parent and sibling.
             const parent = element.parentNode;
             const sibling = element.nextSibling;
