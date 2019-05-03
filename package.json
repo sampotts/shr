@@ -35,7 +35,7 @@
     "dependencies": {},
     "devDependencies": {
         "ansi-colors": "^3.2.4",
-        "aws-sdk": "^2.445.0",
+        "aws-sdk": "^2.447.0",
         "@babel/core": "^7.4.4",
         "@babel/preset-env": "^7.4.4",
         "babel-eslint": "^10.0.1",
@@ -73,7 +73,7 @@
         "stylelint-config-recommended": "^2.2.0",
         "stylelint-config-sass-guidelines": "^6.0.0",
         "stylelint-order": "^3.0.0",
-        "stylelint-scss": "^3.6.0",
+        "stylelint-scss": "^3.6.1",
         "stylelint-selector-bem-pattern": "^2.1.0"
     }
 }

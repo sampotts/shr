@@ -1320,10 +1320,10 @@ aws-sdk@^2.389.0:
     uuid "3.3.2"
     xml2js "0.4.19"
 
-aws-sdk@^2.445.0:
-  version "2.445.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.445.0.tgz#30046be1d4b89c1ba5421514e7cfedf6b102e556"
-  integrity sha512-VontdYjQs7218Mw73IYIVhmbRlnHsbbNxuatOFgKvhFCWh4+ze4joM95ViKOUVofSWwlm1HmNasdhb2kOTg+MA==
+aws-sdk@^2.447.0:
+  version "2.448.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.448.0.tgz#1afa8bc1616aa6bacba393d70923e4294febe430"
+  integrity sha512-RMmdxP0VgI8eq7SehOHINULL6BL84wy9jOngQwJnxCPT/3/5jUuexKjzeFpdXTS4+dVToqj8q9THAbqzuXZ9dQ==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
@@ -8443,10 +8443,10 @@ stylelint-scss@^3.4.0:
     postcss-selector-parser "^5.0.0"
     postcss-value-parser "^3.3.1"
 
-stylelint-scss@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-3.6.0.tgz#5fafe815b68119965f7aa75f0cfc1b04ae4021bd"
-  integrity sha512-Qpw0gl6iLBon5JNeFZjVYOEayd/e+WYIdY2vFhZuXeHC6jb8wl0wRZY97jATt/uxZzdtU3tGLAvJOUMuFp18vw==
+stylelint-scss@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-3.6.1.tgz#eef14df2b6314cbd20d240b72d5b97c40751fef5"
+  integrity sha512-6bB2EHUZsE/bDVKUdzBXqOcfgXmg3zq9Lglgbu16EqMa4PM8Y48XKcB8coOj8CKr07GtlqtOdCNA2E5njoI9Kw==
   dependencies:
     lodash "^4.17.11"
     postcss-media-query-parser "^0.2.3"
