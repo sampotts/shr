@@ -4,22 +4,30 @@
 
 const path = require('path');
 const gulp = require('gulp');
+// ------------------------------------
 // CSS
+// ------------------------------------
 const less = require('gulp-less');
 const sass = require('gulp-sass');
 const clean = require('gulp-clean-css');
 const prefix = require('gulp-autoprefixer');
+// ------------------------------------
 // JavaScript
+// ------------------------------------
 const terser = require('gulp-terser');
 const rollup = require('gulp-better-rollup');
 const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 const sourcemaps = require('gulp-sourcemaps');
+// ------------------------------------
 // Images
+// ------------------------------------
 const svgstore = require('gulp-svgstore');
 const imagemin = require('gulp-imagemin');
+// ------------------------------------
 // Utils
+// ------------------------------------
 const plumber = require('gulp-plumber');
 const rename = require('gulp-rename');
 const replace = require('gulp-replace');
@@ -27,13 +35,22 @@ const size = require('gulp-size');
 const ansi = require('ansi-colors');
 const log = require('fancy-log');
 const del = require('del');
+const through = require('through2');
+// ------------------------------------
 // Deployment
+// ------------------------------------
 const aws = require('aws-sdk');
 const publish = require('gulp-awspublish');
+const FastlyPurge = require('fastly-purge');
+// ------------------------------------
+// Configs
+// ------------------------------------
 const pkg = require('./package.json');
 const build = require('./build.json');
 const deploy = require('./deploy.json');
+// ------------------------------------
 // Get info from package
+// ------------------------------------
 const { browserslist, version } = pkg;
 
 // Get AWS config
@@ -200,7 +217,13 @@ gulp.task('default', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.cs
 
 // Publish a version to CDN and demo
 // --------------------------------------------
-
+// Get deployment config
+let credentials = {};
+try {
+    credentials = require('./credentials.json'); //eslint-disable-line
+} catch (e) {
+    // Do nothing
+}
 // Some options
 const maxAge = 31536000; // seconds 1 year
 const headers = {
@@ -216,6 +239,7 @@ const regex =
     '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
 const semver = new RegExp(`v${regex}`, 'gi');
 const cdnpath = new RegExp(`${deploy.cdn.domain}/${regex}`, 'gi');
+const versionPath = `https://${deploy.cdn.domain}/${version}`;
 const localpath = new RegExp('(../)?dist', 'gi');
 
 // Publish version to CDN bucket
@@ -297,7 +321,7 @@ gulp.task('demo:paths', () => {
     }
 
     return gulp
-        .src([`${paths.demo.root}*.html`])
+        .src([`*.html`, `src/js/app.js`].map(p => path.join(paths.demo.root, p)))
         .pipe(replace(localpath, `https://${domain}/${version}`))
         .pipe(publisher.publish(headers.demo))
         .pipe(publish.reporter());
@@ -319,11 +343,49 @@ gulp.task('demo:error', () => {
         .pipe(publish.reporter());
 });
 
+// Purge the fastly cache incase any 403/404 are cached
+gulp.task('purge', () => {
+    if (!Object.keys(credentials).includes('fastly')) {
+        throw new Error('Fastly credentials required to purge cache.');
+    }
+
+    const { fastly } = credentials;
+    const list = [];
+
+    return gulp
+        .src(paths.upload)
+        .pipe(
+            through.obj((file, enc, cb) => {
+                if (file.stat.isFile()) {
+                    const filename = file.path.split('/').pop();
+                    list.push(`${versionPath}/${filename}`);
+                }
+
+                cb(null);
+            }),
+        )
+        .on('end', () => {
+            const purge = new FastlyPurge(fastly.token);
+
+            list.forEach(url => {
+                log(`Purging ${ansi.cyan(url)}...`);
+
+                purge.url(url, (error, result) => {
+                    if (error) {
+                        log.error(error);
+                    } else if (result) {
+                        log(result);
+                    }
+                });
+            });
+        });
+});
+
 // Publish to Demo bucket
-gulp.task(
-    'demo',
-    gulp.series('clean', gulp.parallel('demo:readme', 'demo:src', 'demo:svg', 'demo:paths', 'demo:error')),
-);
+gulp.task('demo', gulp.parallel('demo:readme', 'demo:src', 'demo:svg', 'demo:paths', 'demo:error'));
 
 // Do everything
-gulp.task('deploy', gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'cdn', 'demo'));
+gulp.task(
+    'deploy',
+    gulp.series('clean', gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite), 'cdn', 'demo', 'purge'),
+);

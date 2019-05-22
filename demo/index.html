@@ -55,6 +55,17 @@
             type="font/woff2"
             href="https://cdn.plyr.io/static/fonts/gordita-black.woff2"
         />
+
+        <!-- Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132699580-2"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                window.dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', 'UA-132699580-2');
+        </script>
     </head>
 
     <body>
@@ -106,51 +117,7 @@
             <a href="https://github.com/sampotts/shr" target="_blank" class="btn">Download on GitHub</a>
         </aside>
 
-        <!-- Load SVG defs -->
-        <!-- You should bundle all SVG/Icons into one file using a build tool such as gulp and svg store -->
-        <script>
-            (function(d, u) {
-                var x = new XMLHttpRequest();
-                var b = d.body;
-
-                // Check for CORS support
-                // If you're loading from same domain, you can remove the if statement
-                // XHR for Chrome/Firefox/Opera/Safari
-                if ('withCredentials' in x) {
-                    x.open('GET', u, true);
-                }
-                // XDomainRequest for older IE
-                else if (typeof XDomainRequest != 'undefined') {
-                    x = new XDomainRequest();
-                    x.open('GET', u);
-                } else {
-                    return;
-                }
-
-                x.send();
-                x.onload = function() {
-                    var c = d.createElement('div');
-                    c.setAttribute('hidden', '');
-                    c.innerHTML = x.responseText;
-                    b.insertBefore(c, b.childNodes[0]);
-                };
-            })(document, '../dist/shr.svg');
-        </script>
-
         <!-- Demo script -->
         <script src="../dist/app.js"></script>
-
-        <!-- Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132699580-2"></script>
-        <script>
-            if (window.location.hostname === 'shr.one') {
-                window.dataLayer = window.dataLayer || [];
-                function gtag() {
-                    window.dataLayer.push(arguments);
-                }
-                gtag('js', new Date());
-                gtag('config', 'UA-132699580-2');
-            }
-        </script>
     </body>
 </html>

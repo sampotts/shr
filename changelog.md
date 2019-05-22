@@ -1,5 +1,16 @@
 # Changelog
 
+# v2.0.2
+
+-   Fixed a bug with handling NaN counts
+-   Fixed a bug with `displayZero` default
+-   Fixed a bug with increment on click not working as expected
+-   Clean up
+
+# v2.0.1
+
+-   Fixed a bug with numbers over 1 million not formatting correctly
+
 # v2.0.0
 
 -   Complete re-write in ES6

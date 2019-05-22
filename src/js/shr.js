@@ -173,8 +173,10 @@ class Shr {
     share(event) {
         this.openPopup(event);
 
+        const { increment } = this.config.count;
+
         this.getCount()
-            .then(data => this.updateDisplay(data, this.config.increment))
+            .then(data => this.updateDisplay(data, increment))
             .catch(() => {});
     }
 
@@ -257,8 +259,9 @@ class Shr {
                 const cached = this.storage.get(this.target);
 
                 if (!is.empty(cached) && Object.keys(cached).includes(this.network)) {
-                    resolve(cached[this.network]);
-                    this.console.log(`getCount for '${this.target}' for '${this.network}' resolved from cache`);
+                    const count = cached[this.network];
+                    resolve(is.number(count) ? count : 0);
+                    this.console.log(`getCount for '${this.target}' for '${this.network}' resolved from cache.`);
                     return;
                 }
             }
@@ -283,10 +286,15 @@ class Shr {
                     // Default to zero for undefined
                     if (is.empty(count)) {
                         count = 0;
-                    }
+                    } else {
+                        // Parse
+                        count = parseInt(count, 10);
 
-                    // Parse
-                    count = parseInt(count, 10);
+                        // Handle NaN
+                        if (!is.number(count)) {
+                            count = 0;
+                        }
+                    }
 
                     // Cache in local storage
                     this.storage.set({

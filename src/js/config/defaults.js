@@ -32,7 +32,7 @@ const defaults = {
     },
     count: {
         className: 'shr__count',
-        displayZero: true,
+        displayZero: false,
         format: true,
         position: 'after',
         increment: true,

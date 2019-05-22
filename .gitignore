@@ -1,3 +1,4 @@
 node_modules
 .DS_Store
 docs/index.dev.html
+credentials.json
