@@ -87,7 +87,7 @@ import Shr from 'shr-buttons';
 Add the following before you're closing `</body>`:
 
 ```html
-<script src="https://shr.one/2.0.0-beta.8/shr.js"></script>
+<script src="https://cdn.shr.one/2.0.0-beta.8/shr.js"></script>
 ```
 
 Alternatively add the script to your main app bundle.
@@ -120,7 +120,7 @@ const button = new Shr('.js-shr', { ...options });
 You don't have to use the Shr CSS. You're free to style the buttons how you like. You can either include the SASS in your build or use the CDN hosted CSS in your `<head>`:
 
 ```html
-<link rel="stylesheet" href="https://shr.one/2.0.0-beta.8/shr.css" />
+<link rel="stylesheet" href="https://cdn.shr.one/2.0.0-beta.8/shr.css" />
 ```
 
 ### 4. SVG Sprite (_optional_)
