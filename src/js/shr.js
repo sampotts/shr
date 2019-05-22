@@ -1,8 +1,8 @@
 /**
  * @name    Shr.js
- * @version 2.0.0-beta.1
+ * @version 2.0.2
  * @author 	Sam Potts
- * @license The MIT License (MIT)
+ * @license MIT
  */
 
 import constants from './config/constants';
