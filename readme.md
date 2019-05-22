@@ -2,7 +2,7 @@
 
 Simple, clean, customizable sharing buttons.
 
-[Donate to support Shr](#donate) - [Checkout the demo](http://shr.one)
+[Donate to support Shr](#donate) - [Checkout the demo](https://shr.one)
 
 [![Image of Shr](https://cdn.shr.one/shr.png)](https://shr.one)
 
