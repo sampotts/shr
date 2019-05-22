@@ -4,13 +4,11 @@
 
 const path = require('path');
 const gulp = require('gulp');
-
 // CSS
 const less = require('gulp-less');
 const sass = require('gulp-sass');
 const clean = require('gulp-clean-css');
 const prefix = require('gulp-autoprefixer');
-
 // JavaScript
 const terser = require('gulp-terser');
 const rollup = require('gulp-better-rollup');
@@ -18,11 +16,9 @@ const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 const sourcemaps = require('gulp-sourcemaps');
-
 // Images
 const svgstore = require('gulp-svgstore');
 const imagemin = require('gulp-imagemin');
-
 // Utils
 const plumber = require('gulp-plumber');
 const rename = require('gulp-rename');
@@ -31,15 +27,13 @@ const size = require('gulp-size');
 const ansi = require('ansi-colors');
 const log = require('fancy-log');
 const del = require('del');
-
 // Deployment
 const aws = require('aws-sdk');
 const publish = require('gulp-awspublish');
-
 const pkg = require('./package.json');
 const build = require('./build.json');
 const deploy = require('./deploy.json');
-
+// Get info from package
 const { browserslist, version } = pkg;
 
 // Get AWS config
@@ -244,8 +238,9 @@ gulp.task('cdn', () => {
             }),
         )
         .pipe(
-            rename(path => {
-                path.dirname = path.dirname.replace('.', version);
+            rename(p => {
+                // eslint-disable-next-line no-param-reassign
+                p.dirname = p.dirname.replace('.', version);
             }),
         )
         .pipe(publisher.publish(headers.cdn))
@@ -254,7 +249,7 @@ gulp.task('cdn', () => {
 
 // Replace versioned files in readme.md
 gulp.task('demo:readme', () => {
-    const { domain } = deploy.demo;
+    const { domain } = deploy.cdn;
 
     return gulp
         .src([`${root}/readme.md`])
@@ -282,8 +277,9 @@ gulp.task('demo:svg', () => {
         .src(path.join(root, 'dist/app.js'))
         .pipe(replace(localpath, `https://${domain}/${version}`))
         .pipe(
-            rename(path => {
-                path.dirname = path.dirname.replace('.', version);
+            rename(p => {
+                // eslint-disable-next-line no-param-reassign
+                p.dirname = p.dirname.replace('.', version);
             }),
         )
         .pipe(publisher.publish(headers.cdn))

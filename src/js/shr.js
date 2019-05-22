@@ -308,33 +308,31 @@ class Shr {
      * @returns {Void}
      */
     updateDisplay(input, increment = false) {
+        const { count, wrapper } = this.config;
         // If we're incrementing (e.g. on click)
-        const count = increment ? input + 1 : input;
+        const number = increment ? input + 1 : input;
         // Standardize position
-        const position = this.config.count.position.toLowerCase();
+        const position = count.position.toLowerCase();
 
         // Only display if there's a count
-        if (count > 0 || this.config.count.displayZero) {
+        if (number > 0 || count.displayZero) {
             const isAfter = position === 'after';
-            const round = unit => Math.round((count / unit) * 10) / 10;
-            // Format
-            let label;
-            if (count < 1000 || !this.config.count.format) {
-                label = formatNumber(count);
-            } else {
-                if (count > 1000000) {
-                    label = `${round(1000000)}M`;
-                }
+            const round = unit => Math.round((number / unit) * 10) / 10;
+            let label = formatNumber(number);
 
-                label = `${round(1000)}K`;
+            // Format to 1K, 1M, etc
+            if (count.format) {
+                if (number > 1000000) {
+                    label = `${round(1000000)}M`;
+                } else if (number > 1000) {
+                    label = `${round(1000)}K`;
+                }
             }
 
             // Update or insert
             if (is.element(this.elements.count)) {
                 this.elements.count.textContent = label;
             } else {
-                const { count, wrapper } = this.config;
-
                 // Add wrapper
                 wrap(
                     this.elements.trigger,
