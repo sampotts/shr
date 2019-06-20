@@ -368,7 +368,7 @@ class Shr {
      * Setup multiple instances
      * @param {String|Element|NodeList|Array} target
      * @param {Object} options
-     * @returns {Array}                                 An array of instances
+     * @returns {Array} - An array of instances
      */
     static setup(target, options = {}) {
         let targets = null;
