@@ -87,7 +87,7 @@ import Shr from 'shr-buttons';
 Add the following before you're closing `</body>`:
 
 ```html
-<script src="https://shr.one/2.0.0/shr.js"></script>
+<script src="https://shr.one/2.0.3/shr.js"></script>
 ```
 
 Alternatively add the script to your main app bundle.
@@ -126,7 +126,7 @@ _Note_: `Shr.setup` will also look for mutations of the DOM and and matching ele
 You don't have to use the Shr CSS. You're free to style the buttons how you like. You can either include the SASS in your build or use the CDN hosted CSS in your `<head>`:
 
 ```html
-<link rel="stylesheet" href="https://shr.one/2.0.0/shr.css" />
+<link rel="stylesheet" href="https://shr.one/2.0.3/shr.css" />
 ```
 
 ### 4. SVG Sprite (_optional_)
