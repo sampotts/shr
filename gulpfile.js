@@ -311,7 +311,7 @@ gulp.task('demo:svg', () => {
 });
 
 // Replace local file paths with remote paths in demo
-// e.g. "../dist/shr.js" to "https://cdn.shr.one/x.x.x/shr.js"
+// e.g. "../dist/shr.js" to "https://cdn.example.com/x.x.x/shr.js"
 gulp.task('demo:paths', () => {
     const { publisher } = deploy.demo;
     const { domain } = deploy.cdn;

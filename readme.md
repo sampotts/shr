@@ -2,10 +2,6 @@
 
 Simple, clean, customizable sharing buttons.
 
-[Donate to support Shr](#donate) - [Checkout the demo](https://shr.one)
-
-[![Image of Shr](https://cdn.shr.one/shr.png)](https://shr.one)
-
 ## Why?
 
 The default share buttons used by the social networks are not only ugly to look at (sorry, they just are) but they usually depend on iframes, are slow and generally heavy. That led to me creating shr (short for share).
@@ -49,7 +45,7 @@ Once Shr has been initialized on a button and data has been fetched, it is manip
 ```html
 <span class="shr">
     <a
-        href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fshr.one"
+        href="https://www.facebook.com/sharer/sharer.php?u={URL_ENCODED_URL}"
         target="_blank"
         class="shr__button shr__button--facebook js-shr"
     >
@@ -84,10 +80,10 @@ import Shr from 'shr-buttons';
 
 #### via a `<script>` element
 
-Add the following before you're closing `</body>`:
+Copy `dist/shr.js` into your project and add the following before your closing `</body>`:
 
 ```html
-<script src="https://cdn.shr.one/2.0.3/shr.js"></script>
+<script src="path/to/shr.js"></script>
 ```
 
 Alternatively add the script to your main app bundle.
@@ -123,10 +119,10 @@ _Note_: `Shr.setup` will also look for mutations of the DOM and and matching ele
 
 ### 3. CSS _(optional)_
 
-You don't have to use the Shr CSS. You're free to style the buttons how you like. You can either include the SASS in your build or use the CDN hosted CSS in your `<head>`:
+You don't have to use the Shr CSS. You're free to style the buttons how you like. You can either include the SASS in your build or copy `dist/shr.css` into your project and include it in your `<head>`:
 
 ```html
-<link rel="stylesheet" href="https://cdn.shr.one/2.0.3/shr.css" />
+<link rel="stylesheet" href="path/to/shr.css" />
 ```
 
 ### 4. SVG Sprite (_optional_)
@@ -384,10 +380,6 @@ Shr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](
 -   [@danpastori](https://github.com/danpastori)
 -   [@danfoley](https://github.com/danfoley)
 -   ...and other [contributors](https://github.com/sampotts/shr/graphs/contributors)
-
-## Donate
-
-Shr costs money to run, not my time (I donate that for free) but domains, hosting and more. Any help is appreciated... [Donate to support Shr](https://www.paypal.me/pottsy/20usd)
 
 ## Thanks
 

@@ -1,12 +1,12 @@
 {
     "cdn": {
         "bucket": "cdn-shr",
-        "domain": "cdn.shr.one",
+        "domain": "cdn.example.com",
         "region": "us-east-1"
     },
     "demo": {
-        "bucket": "shr.one",
-        "domain": "shr.one",
+        "bucket": "example.com",
+        "domain": "example.com",
         "region": "us-east-1"
     }
 }
